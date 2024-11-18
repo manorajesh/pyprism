@@ -1,4 +1,4 @@
-# PyPrism (F24 15-112 Term Project)
+# PyPrism
 
 **PyPrism** is a project aimed at developing a fully functional 3D modeling and rendering toolkit using only Python and the `cmu_graphics` library. This project will delve into the fundamentals of 3D rendering like matrix transformations, perspective projection, and basic shading. Alongside a basic 3D modeling toolkit, the project will also feature a path-traced renderer for realistic lighting simulations.
 
@@ -34,7 +34,7 @@ Key features of the project include:
 
 **Git** will be the main version control for this project. All project files will be hosted on **GitHub** alongside local backups. Regular commits will be made to track project progress and ease development.
 
-![GitHub Repository](https://via.placeholder.com/400x300.png?text=GitHub+Repository+Screenshot)
+![Github Screenshot](https://github.com/manorajesh/pyprism/blob/master/images/repo.png)
 
 ## Tech List
 
