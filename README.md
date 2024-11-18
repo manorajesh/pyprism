@@ -1,5 +1,7 @@
 # PyPrism
 
+![Build & Test](https://github.com/manorajesh/pyprism/actions/workflows/python-app.yml/badge.svg)
+
 **PyPrism** is a project aimed at developing a fully functional 3D modeling and rendering toolkit using only Python and the `cmu_graphics` library. This project will delve into the fundamentals of 3D rendering like matrix transformations, perspective projection, and basic shading. Alongside a basic 3D modeling toolkit, the project will also feature a path-traced renderer for realistic lighting simulations.
 
 Key features of the project include:
