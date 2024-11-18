@@ -186,6 +186,7 @@ def onKeyPress(app, key):
     elif key == 'down':
         app.camera.move(0, 0, -0.1)
     elif key == 'left':
+        # Lateral movement is inverted due to camera orientation
         app.camera.move(0.1, 0, 0)
     elif key == 'right':
         app.camera.move(-0.1, 0, 0)
