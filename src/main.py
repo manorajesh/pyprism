@@ -56,6 +56,23 @@ class Camera():
         self.projection_view_matrix = np.dot(
             self.perspective_matrix, self.view_matrix)
 
+    def move(self, x, y, z):
+        self.x += x
+        self.y += y
+        self.z += z
+
+        self.translation_matrix = np.array([
+            [1, 0, 0, -self.x],
+            [0, 1, 0, -self.y],
+            [0, 0, 1, -self.z],
+            [0, 0, 0, 1]
+        ])
+
+        self.view_matrix = self.translation_matrix
+
+        self.projection_view_matrix = np.dot(
+            self.perspective_matrix, self.view_matrix)
+
 
 class Plane():
     def __init__(self):
@@ -114,6 +131,17 @@ def onAppStart(app):
 
     # Create a plane object
     app.world.addObject(Plane())
+
+
+def onKeyPress(app, key):
+    if key == 'up':
+        app.camera.move(0, 0, 0.1)
+    elif key == 'down':
+        app.camera.move(0, 0, -0.1)
+    elif key == 'left':
+        app.camera.move(-0.1, 0, 0)
+    elif key == 'right':
+        app.camera.move(0.1, 0, 0)
 
 
 def onStep(app):
