@@ -17,7 +17,7 @@ Key features of the project include:
 
    - **Key Features:**
      - Comprehensive scene graph for managing 3D objects.
-     - Advanced shading and lighting models.
+     - Advanced shading and lighting.
      - Support for various 3D file formats and textures.
 
 2. **Blender 3D**
@@ -29,8 +29,8 @@ Key features of the project include:
 3. **Unity Engine**
 
    - **Key Features:**
-     - Intuitive editor for scene management and object manipulation.
-     - Real-time lighting and shadowing features.
+     - Editor for scene management and object manipulation.
+     - Real-time lighting and shading features.
 
 ## Version Control
 
