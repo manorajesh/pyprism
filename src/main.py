@@ -46,15 +46,6 @@ def rotation_matrix_y(angle_rad):
     ]
 
 
-def rotation_matrix_x(angle_rad):
-    return [
-        [1, 0, 0, 0],
-        [0, math.cos(angle_rad), -math.sin(angle_rad), 0],
-        [0, math.sin(angle_rad), math.cos(angle_rad), 0],
-        [0, 0, 0, 1]
-    ]
-
-
 class World:
     def __init__(self, camera):
         self.camera = camera
@@ -132,11 +123,8 @@ class Plane:
             [-1, 1, 0, 1]    # Top-left
         ]
 
-    def rotate(self, angle_rad, axis='y'):
-        if axis == 'y':
-            R = rotation_matrix_y(angle_rad)
-        elif axis == 'x':
-            R = rotation_matrix_x(angle_rad)
+    def rotate(self, angle_rad):
+        R = rotation_matrix_y(angle_rad)
 
         # Apply rotation to each vertex
         rotated_vertices = []
