@@ -153,7 +153,7 @@ class Plane:
                 camera.projection_view_matrix, vertex)
             transformed_vertices.append(transformed_vertex)
 
-        # Perspective Division to get Normalized Device Coordinates (NDC)
+        # Perspective Division to Normalized Device Coordinates (NDC)
         ndc = []
         for p in transformed_vertices:
             if p[3] == 0:
@@ -179,7 +179,6 @@ class Plane:
 
 
 def onAppStart(app):
-    # Initialize the camera
     app.camera = Camera(
         x=0, y=0, z=-5,
         aspect_ratio=app.width / app.height,
@@ -188,10 +187,8 @@ def onAppStart(app):
         far=1000
     )
 
-    # Initialize world
     app.world = World(app.camera)
 
-    # Create a plane object
     app.world.addObject(Plane())
 
 
@@ -201,13 +198,12 @@ def onKeyPress(app, key):
     elif key == 'down':
         app.camera.move(0, 0, -0.1)
     elif key == 'left':
-        app.camera.move(-0.1, 0, 0)
-    elif key == 'right':
         app.camera.move(0.1, 0, 0)
+    elif key == 'right':
+        app.camera.move(-0.1, 0, 0)
 
 
 def onStep(app):
-    # Rotate the plane object
     for obj in app.world.objects:
         obj.rotate(math.radians(1))
 
