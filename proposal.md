@@ -34,7 +34,7 @@ Key features of the project include:
 
 **Git** will be the main version control for this project. All project files will be hosted on **GitHub** alongside local backups. Regular commits will be made to track project progress and ease development.
 
-![GitHub Repository](https://via.placeholder.com/400x300.png?text=GitHub+Repository+Screenshot)
+![Github Screenshot](https://github.com/manorajesh/pyprism/blob/master/images/repo.png)
 
 ## Tech List
 
