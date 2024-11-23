@@ -47,9 +47,11 @@ def rotation_matrix_y(angle_rad):
 
 
 class World:
-    def __init__(self, camera):
+    def __init__(self, camera, width, height):
         self.camera = camera
         self.objects = []
+        self.width = width
+        self.height = height
 
     def addObject(self, obj):
         self.objects.append(obj)
@@ -59,6 +61,11 @@ class World:
             self.objects.remove(obj)
 
     def render(self, width, height):
+        if width != self.width or height != self.height:
+            self.camera.resize(width, height)
+            self.width = width
+            self.height = height
+
         for obj in self.objects:
             obj.render(self.camera, width, height)
 
@@ -109,6 +116,22 @@ class Camera:
         ]
 
         self.view_matrix = self.translation_matrix
+
+        self.projection_view_matrix = matrix_multiply(
+            self.perspective_matrix, self.view_matrix)
+
+    def resize(self, width, height):
+        fov_rad = math.radians(self.fov)
+        f = 1 / math.tan(fov_rad / 2)
+
+        self.aspect_ratio = width / height
+        self.perspective_matrix = [
+            [f / self.aspect_ratio, 0, 0, 0],
+            [0, f, 0, 0],
+            [0, 0, -(self.far + self.near) / (self.far - self.near), -
+             (2 * self.far * self.near) / (self.far - self.near)],
+            [0, 0, -1, 0]
+        ]
 
         self.projection_view_matrix = matrix_multiply(
             self.perspective_matrix, self.view_matrix)
@@ -175,7 +198,7 @@ def onAppStart(app):
         far=1000
     )
 
-    app.world = World(app.camera)
+    app.world = World(app.camera, app.width, app.height)
 
     app.world.addObject(Plane())
 
