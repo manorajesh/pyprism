@@ -31,6 +31,10 @@ def onKeyPress(app, key):
         app.camera.move(-0.1, 0, 0)
 
 
+def onMouseDrag(app, mouseX, mouseY):
+    app.camera.orbit(mouseX, mouseY)
+
+
 def onStep(app):
     for obj in app.world.objects:
         obj.rotate(math.radians(1))

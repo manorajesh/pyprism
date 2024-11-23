@@ -43,3 +43,16 @@ def rotation_matrix_y(angle_rad):
         [-math.sin(angle_rad), 0, math.cos(angle_rad), 0],
         [0, 0, 0, 1]
     ]
+
+
+def subtract(a, b):
+    return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
+
+
+def length(v):
+    return math.sqrt(v[0]**2 + v[1]**2 + v[2]**2)
+
+
+def normalize(v):
+    l = length(v)
+    return [v[0] / l, v[1] / l, v[2] / l]
