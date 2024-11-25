@@ -15,33 +15,25 @@ class Gizmo:
         ]
 
     def render(self, camera, width, height, edit_mode=False):
-        rotation_matrix = [
-            [camera.view_matrix[0][0], camera.view_matrix[0]
-                [1], camera.view_matrix[0][2], 0],
-            [camera.view_matrix[1][0], camera.view_matrix[1]
-                [1], camera.view_matrix[1][2], 0],
-            [camera.view_matrix[2][0], camera.view_matrix[2]
-                [1], camera.view_matrix[2][2], 0],
-            [0, 0, 0, 1]
-        ]
-
-        gizmo_size_in_pixels = 50
+        gizmo_size_in_pixels = 40
         offset_x = width - 50 - gizmo_size_in_pixels
         offset_y = 50
 
         # Draw background circle
         drawCircle(offset_x + gizmo_size_in_pixels / 2,
-                   offset_y + gizmo_size_in_pixels / 2, gizmo_size_in_pixels / 2 + 5, fill='white', opacity=20)
+                   offset_y + gizmo_size_in_pixels / 2, gizmo_size_in_pixels, fill='white', opacity=20)
 
         # Render axes
         for start, end, color in self.axes:
+            # Apply camera transformation for perspective projection
             transformed_start = matrix_vector_multiply(
-                rotation_matrix, start)
+                camera.projection_view_matrix, start)
             transformed_end = matrix_vector_multiply(
-                rotation_matrix, end)
+                camera.projection_view_matrix, end)
 
-            ndc_start = [transformed_start[0], transformed_start[1]]
-            ndc_end = [transformed_end[0], transformed_end[1]]
+            # Just use transformed start and end points as NDC
+            ndc_start = transformed_start
+            ndc_end = transformed_end
 
             screen_start = [
                 offset_x + (ndc_start[0] + 1) * (gizmo_size_in_pixels / 2),

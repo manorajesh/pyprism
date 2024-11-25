@@ -38,8 +38,8 @@ def onAppStart(app):
     app.world = World(app.camera, app.width, app.height)
 
     app.world.addObject(Grid(size=5))
-    # app.world.addObject(Cube())
-    app.world.addObject(Sphere())
+    app.world.addObject(Cube())
+    # app.world.addObject(Sphere())
     app.world.addObject(Gizmo())
 
 

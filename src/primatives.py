@@ -9,15 +9,10 @@ class Mesh:
         self.indices = indices    # List of triangle indices
         self.shading_model = shading_model
 
-    def rotate(self, angle_rad):
-        R = rotation_matrix_y(angle_rad)
-        rotated_vertices = []
-        for vertex in self.vertices:
-            rotated_vertex = matrix_vector_multiply(R, vertex)
-            rotated_vertices.append(rotated_vertex)
-        self.vertices = rotated_vertices
-
     def render(self, camera, width, height, edit_mode=False):
+        # Perspective projection
+        # https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix.html
+
         # Transform vertices to clip space
         transformed_vertices = [matrix_vector_multiply(
             camera.projection_view_matrix, v) for v in self.vertices]
@@ -70,41 +65,13 @@ class Mesh:
 
         triangles.sort(key=lambda tri: tri['depth'], reverse=True)
 
-        for tri in triangles:
-            drawPolygon(*tri['points'], fill=tri['color'])
-
         if edit_mode:
-            for tri in triangles:
-                drawCircle(tri['points'][0], tri['points'][1], 5, fill='red')
+            for point in screen_coords:
+                drawCircle(point[0], point[1], 3, fill='orange')
 
-
-class Sphere(Mesh):
-    def __init__(self, radius=1.0, segments=16):
-        vertices = []
-        indices = []
-
-        # Generate vertices
-        for i in range(segments + 1):
-            lat = math.pi * (-0.5 + float(i) / segments)
-            for j in range(segments + 1):
-                lon = 2 * math.pi * float(j) / segments
-                x = math.cos(lat) * math.cos(lon) * radius
-                y = math.sin(lat) * radius
-                z = math.cos(lat) * math.sin(lon) * radius
-                vertices.append([x, y, z, 1])
-
-        # Generate indices with reversed winding order
-        for i in range(segments):
-            for j in range(segments):
-                first = i * (segments + 1) + j
-                second = first + segments + 1
-                # Reverse the order of vertices in each triangle
-                indices.extend([
-                    first + 1, first, second + 1,
-                    second + 1, first, second
-                ])
-
-        super().__init__(vertices, indices)
+        for tri in triangles:
+            drawPolygon(*tri['points'], fill=tri['color'],
+                        opacity=50 if edit_mode else 100)
 
 
 class Cube(Mesh):
@@ -169,12 +136,10 @@ class Grid(Mesh):
         # Generate vertices for grid lines along X and Z axes
         for i in range(divisions + 1):
             position = -half_size + i * step
-            # Lines parallel to Z axis (along X)
             vertices.append([position, 0, -half_size, 1])  # Start point
             vertices.append([position, 0, half_size, 1])   # End point
             indices.extend([len(vertices) - 2, len(vertices) - 1])
 
-            # Lines parallel to X axis (along Z)
             vertices.append([-half_size, 0, position, 1])  # Start point
             vertices.append([half_size, 0, position, 1])   # End point
             indices.extend([len(vertices) - 2, len(vertices) - 1])
@@ -182,7 +147,10 @@ class Grid(Mesh):
         super().__init__(vertices, indices)
 
     def render(self, camera, width, height, edit_mode=False):
-        # Transform vertices to clip space
+        # The rendering logic is the same as any object in the scene
+        # Just the final drawLine call is different
+
+        # Transform vertices
         transformed_vertices = [matrix_vector_multiply(
             camera.projection_view_matrix, v) for v in self.vertices]
 

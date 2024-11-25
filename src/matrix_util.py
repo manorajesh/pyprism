@@ -36,15 +36,6 @@ def dot_product(a, b):
     return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
 
 
-def rotation_matrix_y(angle_rad):
-    return [
-        [math.cos(angle_rad), 0, math.sin(angle_rad), 0],
-        [0, 1, 0, 0],
-        [-math.sin(angle_rad), 0, math.cos(angle_rad), 0],
-        [0, 0, 0, 1]
-    ]
-
-
 def subtract(a, b):
     return [a[0] - b[0], a[1] - b[1], a[2] - b[2]]
 

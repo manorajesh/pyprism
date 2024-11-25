@@ -12,6 +12,7 @@ class ShadingModel:
 
 
 class Lambertian(ShadingModel):
+    # https://lavalle.pl/vr/node197.html
     def shade(self, normal, light_dir):
         # Normalize vectors
         normal = normalize(normal)

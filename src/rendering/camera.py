@@ -3,6 +3,11 @@ from matrix_util import *
 
 class Camera:
     def __init__(self, x, y, z, aspect_ratio, fov=90, near=0.1, far=1000):
+        # gluPerspective https://www.khronos.org/registry/OpenGL-Refpages/gl2.1/xhtml/gluPerspective.xml
+
+        # Perspective Projection Matrix
+        # https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix.html
+
         self.x = x
         self.y = y
         self.z = z
@@ -72,6 +77,9 @@ class Camera:
             self.perspective_matrix, self.view_matrix)
 
     def orbit(self, dx, dy, target=[0, 0, 0], sensitivity=0.01):
+        # Orbit Camera
+        # https://community.khronos.org/t/implementing-an-orbit-camera/75208/4
+
         dAzimuth = sensitivity * dx
         dElevation = sensitivity * dy
 
@@ -95,6 +103,7 @@ class Camera:
         self.lookAt([self.x, self.y, self.z], target, [0, 1, 0])
 
     def lookAt(self, position, target, up):
+        # gluLookAt https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml
         z = normalize(subtract(position, target))
         x = normalize(cross_product(up, z))
         y = cross_product(z, x)
@@ -114,6 +123,8 @@ class Camera:
 
     def get_view_direction(self):
         # Calculate the view direction vector based on azimuth and elevation
+        # https://community.khronos.org/t/implementing-an-orbit-camera/75208/4
+
         x = math.cos(self.elevation) * math.sin(self.azimuth)
         y = math.sin(self.elevation)
         z = math.cos(self.elevation) * math.cos(self.azimuth)
@@ -128,7 +139,7 @@ class Camera:
         return [x, y, z]
 
     def zoom(self, amount):
-        # sensitivity should decrease as the radius decreases
+        # Sensitivity should decrease as the radius decreases
         sensitivity = 0.001 * self.radius
         self.radius += amount * sensitivity
         self.radius = max(0.1, self.radius)
