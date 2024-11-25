@@ -1,8 +1,8 @@
 from cmu_graphics import *
 import time
 
-from primatives import *
-from gizmo import *
+from objects.primatives import *
+from objects.gizmo import *
 from rendering.camera import *
 from rendering.world import *
 
