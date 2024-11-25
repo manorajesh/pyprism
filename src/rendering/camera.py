@@ -11,9 +11,9 @@ class Camera:
         self.near = near
         self.far = far
 
-        self.previous_mouse = None
         self.azimuth = 0.0
         self.elevation = 0.0
+        self.radius = 5.0
 
         fov_rad = math.radians(fov)
         f = 1 / math.tan(fov_rad / 2)
@@ -71,15 +71,9 @@ class Camera:
         self.projection_view_matrix = matrix_multiply(
             self.perspective_matrix, self.view_matrix)
 
-    def orbit(self, mouseX, mouseY, target=[0, 0, 0], radius=5.0, sensitivity=0.05):
-        if self.previous_mouse is None:
-            self.previous_mouse = [mouseX, mouseY]
-            return
-
-        dAzimuth = sensitivity * (mouseX - self.previous_mouse[0])
-        dElevation = sensitivity * (mouseY - self.previous_mouse[1])
-
-        self.previous_mouse = [mouseX, mouseY]
+    def orbit(self, dx, dy, target=[0, 0, 0], sensitivity=0.01):
+        dAzimuth = sensitivity * dx
+        dElevation = sensitivity * dy
 
         # Update azimuth and elevation
         self.azimuth += dAzimuth
@@ -88,10 +82,10 @@ class Camera:
         self.elevation = max(-math.pi / 2, min(math.pi / 2, self.elevation))
 
         # Get the new camera position
-        x = target[0] + radius * \
+        x = target[0] + self.radius * \
             math.cos(self.elevation) * math.sin(self.azimuth)
-        y = target[1] + radius * math.sin(self.elevation)
-        z = target[2] + radius * \
+        y = target[1] + self.radius * math.sin(self.elevation)
+        z = target[2] + self.radius * \
             math.cos(self.elevation) * math.cos(self.azimuth)
 
         # Update camera position
@@ -117,3 +111,25 @@ class Camera:
 
     def position(self):
         return [self.x, self.y, self.z]
+
+    def get_view_direction(self):
+        # Calculate the view direction vector based on azimuth and elevation
+        x = math.cos(self.elevation) * math.sin(self.azimuth)
+        y = math.sin(self.elevation)
+        z = math.cos(self.elevation) * math.cos(self.azimuth)
+
+        # Normalize the vector
+        length = math.sqrt(x * x + y * y + z * z)
+        if length != 0:
+            x /= length
+            y /= length
+            z /= length
+
+        return [x, y, z]
+
+    def zoom(self, amount):
+        # sensitivity should decrease as the radius decreases
+        sensitivity = 0.001 * self.radius
+        self.radius += amount * sensitivity
+        self.radius = max(0.1, self.radius)
+        self.orbit(0, 0)

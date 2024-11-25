@@ -56,11 +56,11 @@ class Mesh:
             normal = cross_product(edge1, edge2)
 
             # Backface culling
-            # if dot_product(normal, view_dir) >= 0:
-            #     continue  # Skip triangles facing away
+            if dot_product(normal, camera.get_view_direction()) >= 0:
+                continue  # Skip triangles facing away
 
             # Shading
-            color = self.shading_model.shade(normal, light_dir=[0, -0.5, 1])
+            color = self.shading_model.shade(normal, light_dir=[1, -1, 1])
 
             # Calculate average depth
             avg_depth = sum([v[2] for v in [v0, v1, v2]]) / 3
@@ -123,3 +123,53 @@ class Plane(Mesh):
         ]
 
         super().__init__(vertices, indices)
+
+
+class Grid(Mesh):
+    def __init__(self, size=10.0, divisions=10):
+        vertices = []
+        indices = []
+
+        half_size = size / 2.0
+        step = size / divisions
+
+        # Generate vertices for grid lines along X and Z axes
+        for i in range(divisions + 1):
+            position = -half_size + i * step
+            # Lines parallel to Z axis (along X)
+            vertices.append([position, 0, -half_size, 1])  # Start point
+            vertices.append([position, 0, half_size, 1])   # End point
+            indices.extend([len(vertices) - 2, len(vertices) - 1])
+
+            # Lines parallel to X axis (along Z)
+            vertices.append([-half_size, 0, position, 1])  # Start point
+            vertices.append([half_size, 0, position, 1])   # End point
+            indices.extend([len(vertices) - 2, len(vertices) - 1])
+
+        super().__init__(vertices, indices)
+
+    def render(self, camera, width, height):
+        # Transform vertices to clip space
+        transformed_vertices = [matrix_vector_multiply(
+            camera.projection_view_matrix, v) for v in self.vertices]
+
+        # Perspective division and conversion to NDC
+        ndc = [[v[0] / v[3], v[1] / v[3], v[2] / v[3]] if v[3] != 0 else [0, 0, 0]
+               for v in transformed_vertices]
+
+        # Screen space conversion
+        screen_coords = [[(x + 1) * (width / 2), (1 - y) * (height / 2)]
+                         for x, y, z in ndc]
+
+        # Draw grid lines
+        for i in range(0, len(self.indices), 2):
+            idx_start = self.indices[i]
+            idx_end = self.indices[i + 1]
+
+            start_point = screen_coords[idx_start]
+            end_point = screen_coords[idx_end]
+
+            # Draw line between the start and end points
+            drawLine(start_point[0], start_point[1],
+                     end_point[0], end_point[1],
+                     fill='lightGray')
