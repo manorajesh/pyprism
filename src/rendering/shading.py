@@ -19,7 +19,7 @@ class Lambertian(ShadingModel):
         light_dir = normalize(light_dir)
 
         # Compute the diffuse intensity
-        intensity = self.diffuse * max(0.2, dot_product(normal, light_dir))
+        intensity = self.diffuse * max(0.2, dot(normal, light_dir))
 
         # Scale to 0-255 and clamp
         intensity = int(min(max(intensity * 255, 0), 200))

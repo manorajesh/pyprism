@@ -105,13 +105,13 @@ class Camera:
     def lookAt(self, position, target, up):
         # gluLookAt https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml
         z = normalize(subtract(position, target))
-        x = normalize(cross_product(up, z))
-        y = cross_product(z, x)
+        x = normalize(cross(up, z))
+        y = cross(z, x)
 
         self.view_matrix = [
-            [x[0], x[1], x[2], -dot_product(x, position)],
-            [y[0], y[1], y[2], -dot_product(y, position)],
-            [z[0], z[1], z[2], -dot_product(z, position)],
+            [x[0], x[1], x[2], -dot(x, position)],
+            [y[0], y[1], y[2], -dot(y, position)],
+            [z[0], z[1], z[2], -dot(z, position)],
             [0, 0, 0, 1]
         ]
 

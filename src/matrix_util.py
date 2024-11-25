@@ -24,16 +24,12 @@ def matrix_vector_multiply(matrix, vector):
     return result
 
 
-def cross_product(a, b):
+def cross(a, b):
     return [
         a[1]*b[2] - a[2]*b[1],
         a[2]*b[0] - a[0]*b[2],
         a[0]*b[1] - a[1]*b[0]
     ]
-
-
-def dot_product(a, b):
-    return a[0]*b[0] + a[1]*b[1] + a[2]*b[2]
 
 
 def subtract(a, b):
@@ -50,3 +46,7 @@ def normalize(v):
         return [0, 0, 0]
 
     return [v[0] / l, v[1] / l, v[2] / l]
+
+
+def dot(a, b):
+    return sum([a[i] * b[i] for i in range(len(a))])

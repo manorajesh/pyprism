@@ -48,10 +48,10 @@ class Mesh:
             # Calculate edges and normal
             edge1 = [world_v1[i] - world_v0[i] for i in range(3)]
             edge2 = [world_v2[i] - world_v0[i] for i in range(3)]
-            normal = cross_product(edge1, edge2)
+            normal = cross(edge1, edge2)
 
             # Backface culling
-            if dot_product(normal, camera.get_view_direction()) <= 0:
+            if dot(normal, camera.get_view_direction()) <= 0 and not edit_mode:
                 continue  # Skip triangles facing away
 
             # Shading
