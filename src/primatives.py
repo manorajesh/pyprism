@@ -17,7 +17,7 @@ class Mesh:
             rotated_vertices.append(rotated_vertex)
         self.vertices = rotated_vertices
 
-    def render(self, camera, width, height):
+    def render(self, camera, width, height, edit_mode=False):
         # Transform vertices to clip space
         transformed_vertices = [matrix_vector_multiply(
             camera.projection_view_matrix, v) for v in self.vertices]
@@ -72,6 +72,10 @@ class Mesh:
 
         for tri in triangles:
             drawPolygon(*tri['points'], fill=tri['color'])
+
+        if edit_mode:
+            for tri in triangles:
+                drawCircle(tri['points'][0], tri['points'][1], 5, fill='red')
 
 
 class Sphere(Mesh):
@@ -177,7 +181,7 @@ class Grid(Mesh):
 
         super().__init__(vertices, indices)
 
-    def render(self, camera, width, height):
+    def render(self, camera, width, height, edit_mode=False):
         # Transform vertices to clip space
         transformed_vertices = [matrix_vector_multiply(
             camera.projection_view_matrix, v) for v in self.vertices]

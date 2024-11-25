@@ -14,7 +14,7 @@ class Gizmo:
             ([0, 0, 0, 1], [0, 0, size, 1], 'blue'),
         ]
 
-    def render(self, camera, width, height):
+    def render(self, camera, width, height, edit_mode=False):
         rotation_matrix = [
             [camera.view_matrix[0][0], camera.view_matrix[0]
                 [1], camera.view_matrix[0][2], 0],

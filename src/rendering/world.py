@@ -12,11 +12,11 @@ class World:
         if obj in self.objects:
             self.objects.remove(obj)
 
-    def render(self, width, height):
+    def render(self, width, height, edit_mode=False):
         if width != self.width or height != self.height:
             self.camera.resize(width, height)
             self.width = width
             self.height = height
 
         for obj in self.objects:
-            obj.render(self.camera, width, height)
+            obj.render(self.camera, width, height, edit_mode)

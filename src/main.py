@@ -22,6 +22,7 @@ def onAppStart(app):
     app.frame_time = FrameTime()
     app.is_orbiting = False
     app.is_zooming = False
+    app.edit_mode = False
     app.prev_mouse = (0, 0)
 
     app.camera = Camera(
@@ -53,12 +54,15 @@ def onMouseMove(app, mouseX, mouseY):
         app.camera.orbit(-dx, dy)
 
 
-def onKeyPress(app, key, modifiers):
+def onKeyPress(app, key):
     if key == 'space':
         app.is_orbiting = True
 
     if key == 'z':
         app.is_zooming = True
+
+    if key == 'tab':
+        app.edit_mode = not app.edit_mode
 
 
 def onKeyRelease(app, key):
@@ -75,7 +79,9 @@ def onStep(app):
 
 def redrawAll(app):
     drawLabel(f"Frame time: {app.frame_time.get():.2f}ms", 100, 10)
-    app.world.render(app.width, app.height)
+    if app.edit_mode:
+        drawLabel("Edit Mode", 100, 30, fill='red')
+    app.world.render(app.width, app.height, app.edit_mode)
 
 
 def main():
