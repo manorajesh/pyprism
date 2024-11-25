@@ -1,6 +1,6 @@
 from cmu_graphics import *
 
-from primatives.plane import *
+from primatives import *
 from rendering.camera import *
 from rendering.world import *
 
@@ -16,7 +16,7 @@ def onAppStart(app):
 
     app.world = World(app.camera, app.width, app.height)
 
-    app.world.addObject(Plane())
+    app.world.addObject(Cube())
 
 
 def onKeyPress(app, key):

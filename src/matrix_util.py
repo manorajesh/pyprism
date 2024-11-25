@@ -55,4 +55,7 @@ def length(v):
 
 def normalize(v):
     l = length(v)
+    if l == 0:
+        return [0, 0, 0]
+
     return [v[0] / l, v[1] / l, v[2] / l]

@@ -114,3 +114,6 @@ class Camera:
 
         self.projection_view_matrix = matrix_multiply(
             self.perspective_matrix, self.view_matrix)
+
+    def position(self):
+        return [self.x, self.y, self.z]
