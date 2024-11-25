@@ -2,6 +2,7 @@ from cmu_graphics import *
 import time
 
 from primatives import *
+from gizmo import *
 from rendering.camera import *
 from rendering.world import *
 
@@ -17,6 +18,7 @@ class FrameTime:
 
 
 def onAppStart(app):
+    app.background = rgb(64, 64, 64)
     app.frame_time = FrameTime()
     app.is_orbiting = False
     app.is_zooming = False
@@ -30,10 +32,14 @@ def onAppStart(app):
         far=1000
     )
 
+    app.camera.orbit(10, 10)
+
     app.world = World(app.camera, app.width, app.height)
 
     app.world.addObject(Grid(size=5))
-    # app.world.addObject(Sphere())
+    # app.world.addObject(Cube())
+    app.world.addObject(Sphere())
+    app.world.addObject(Gizmo())
 
 
 def onMouseMove(app, mouseX, mouseY):
@@ -48,7 +54,6 @@ def onMouseMove(app, mouseX, mouseY):
 
 
 def onKeyPress(app, key, modifiers):
-    print(modifiers)
     if key == 'space':
         app.is_orbiting = True
 

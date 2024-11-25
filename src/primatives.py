@@ -56,7 +56,7 @@ class Mesh:
             normal = cross_product(edge1, edge2)
 
             # Backface culling
-            if dot_product(normal, camera.get_view_direction()) >= 0:
+            if dot_product(normal, camera.get_view_direction()) <= 0:
                 continue  # Skip triangles facing away
 
             # Shading
@@ -72,6 +72,35 @@ class Mesh:
 
         for tri in triangles:
             drawPolygon(*tri['points'], fill=tri['color'])
+
+
+class Sphere(Mesh):
+    def __init__(self, radius=1.0, segments=16):
+        vertices = []
+        indices = []
+
+        # Generate vertices
+        for i in range(segments + 1):
+            lat = math.pi * (-0.5 + float(i) / segments)
+            for j in range(segments + 1):
+                lon = 2 * math.pi * float(j) / segments
+                x = math.cos(lat) * math.cos(lon) * radius
+                y = math.sin(lat) * radius
+                z = math.cos(lat) * math.sin(lon) * radius
+                vertices.append([x, y, z, 1])
+
+        # Generate indices with reversed winding order
+        for i in range(segments):
+            for j in range(segments):
+                first = i * (segments + 1) + j
+                second = first + segments + 1
+                # Reverse the order of vertices in each triangle
+                indices.extend([
+                    first + 1, first, second + 1,
+                    second + 1, first, second
+                ])
+
+        super().__init__(vertices, indices)
 
 
 class Cube(Mesh):
@@ -169,7 +198,14 @@ class Grid(Mesh):
             start_point = screen_coords[idx_start]
             end_point = screen_coords[idx_end]
 
-            # Draw line between the start and end points
-            drawLine(start_point[0], start_point[1],
-                     end_point[0], end_point[1],
-                     fill='lightGray')
+            # color the two center x and z axis lines red and blue
+            if idx_start == 20:
+                drawLine(start_point[0], start_point[1],
+                         end_point[0], end_point[1], fill='blue')
+            elif idx_start == 22:
+                drawLine(start_point[0], start_point[1],
+                         end_point[0], end_point[1], fill='red')
+            else:
+                drawLine(start_point[0], start_point[1],
+                         end_point[0], end_point[1],
+                         fill=rgb(50, 50, 50))
