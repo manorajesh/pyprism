@@ -39,7 +39,6 @@ def onAppStart(app):
 
     app.world.addObject(Grid(size=5))
     app.world.addObject(Cube())
-    # app.world.addObject(Sphere())
     app.world.addObject(Gizmo())
 
 
