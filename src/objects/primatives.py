@@ -4,10 +4,17 @@ from rendering.shading import *
 
 
 class Mesh:
-    def __init__(self, vertices, indices, shading_model=Lambertian()):
+    def __init__(self, vertices, indices, shading_model=Lambertian(), is_editable=False):
         self.vertices = vertices  # List of [x,y,z,w] vertices
         self.indices = indices    # List of triangle indices
         self.shading_model = shading_model
+
+        # Screen coordinates for vertices
+        # Used for point selection in edit mode
+        self.screen_coords = None
+        self.selected_vertex = None
+
+        self.is_editable = is_editable
 
     def render(self, camera, width, height, edit_mode=False):
         # Perspective projection
@@ -65,13 +72,21 @@ class Mesh:
 
         triangles.sort(key=lambda tri: tri['depth'], reverse=True)
 
+        self.screen_coords = screen_coords
+
         if edit_mode:
             for point in screen_coords:
-                drawCircle(point[0], point[1], 3, fill='orange')
+                color = 'orange' if point == self.selected_vertex else 'white'
+                drawCircle(point[0], point[1], 3, fill=color)
 
         for tri in triangles:
             drawPolygon(*tri['points'], fill=tri['color'],
                         opacity=50 if edit_mode else 100)
+
+    def point_over_vertex(self, x, y, threshold=5):
+        for point in self.screen_coords:
+            if abs(point[0] - x) < threshold and abs(point[1] - y) < threshold:
+                self.selected_vertex = point
 
 
 class Cube(Mesh):
@@ -105,7 +120,7 @@ class Cube(Mesh):
             4, 5, 1,  4, 1, 0
         ]
 
-        super().__init__(vertices, indices)
+        super().__init__(vertices, indices, is_editable=True)
 
 
 class Plane(Mesh):
@@ -122,7 +137,7 @@ class Plane(Mesh):
             0, 1, 2,  0, 2, 3
         ]
 
-        super().__init__(vertices, indices)
+        super().__init__(vertices, indices, is_editable=True)
 
 
 class Grid(Mesh):

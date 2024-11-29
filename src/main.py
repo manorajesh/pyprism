@@ -51,6 +51,8 @@ def onMouseMove(app, mouseX, mouseY):
         app.camera.zoom(dy)
     elif app.is_orbiting:
         app.camera.orbit(-dx, dy)
+    else:
+        app.world.onMouseMove(mouseX, mouseY, app.edit_mode)
 
 
 def onKeyPress(app, key):

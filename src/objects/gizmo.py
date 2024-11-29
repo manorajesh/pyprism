@@ -3,7 +3,8 @@ from matrix_util import *
 
 
 class Gizmo:
-    def __init__(self, size=1.0):
+    def __init__(self, size=1.0, is_editable=False):
+        self.is_editable = is_editable
         self.size = size
         self.axes = [
             # X-axis

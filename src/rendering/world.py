@@ -20,3 +20,9 @@ class World:
 
         for obj in self.objects:
             obj.render(self.camera, width, height, edit_mode)
+
+    def onMouseMove(self, mouseX, mouseY, edit_mode=False):
+        if edit_mode:
+            for obj in self.objects:
+                if obj.is_editable:
+                    obj.point_over_vertex(mouseX, mouseY)
