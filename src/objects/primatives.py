@@ -12,20 +12,19 @@ class Mesh:
         # Screen coordinates for vertices
         # Used for point selection in edit mode
         self.screen_coords = None
-        self.selected_vertex = None
 
         self.is_editable = is_editable
         self.is_selectable = is_selectable
         self.selected_vertex = None
         self.transform_matrix = identity_matrix()
 
-    def render(self, app, camera, width, height, edit_mode=False):
+    def render(self, app):
         # Perspective projection
         # https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix.html
 
         # Apply transformations to vertices
         transformed_vertices = [matrix_vector_multiply(
-            camera.projection_view_matrix,
+            app.camera.projection_view_matrix,
             matrix_vector_multiply(self.transform_matrix, v)
         ) for v in self.vertices]
 
@@ -39,8 +38,8 @@ class Mesh:
                            point[3], point[2]/point[3]])
 
         # Screen space conversion
-        screen_coords = [[(x + 1) * (width / 2), (1 - y) *
-                          (height / 2), z] for x, y, z in ndc]
+        screen_coords = [[(x + 1) * (app.width / 2), (1 - y) *
+                          (app.height / 2), z] for x, y, z in ndc]
 
         # Render with drawPolygon
         triangles = []
@@ -60,8 +59,8 @@ class Mesh:
                 (v0[1] + v1[1] + v2[1]) / 3
             ]
 
-            # Inset vertices slightly toward center
-            inset = 1.01  # Adjust this value to control gap size
+            # Inset vertices slightly away from center
+            inset = 1.01
             v0_inset = [
                 center[0] + (v0[0] - center[0]) * inset,
                 center[1] + (v0[1] - center[1]) * inset,
@@ -93,7 +92,7 @@ class Mesh:
             normal = cross(edge1, edge2)
 
             # Backface culling
-            if dot(normal, camera.get_view_direction()) <= 0 and not edit_mode:
+            if dot(normal, app.camera.get_view_direction()) <= 0 and not app.edit_mode:
                 continue  # Skip triangles facing away
 
             # Shading
@@ -109,23 +108,23 @@ class Mesh:
 
         self.screen_coords = screen_coords
 
-        if edit_mode:
+        if app.edit_mode:
             for point in screen_coords:
                 drawCircle(point[0], point[1], 2, fill='white')
 
         # Highlight selected vertex or mesh
-        if edit_mode and self.selected_vertex is not None:
+        if app.edit_mode and self.selected_vertex is not None:
             point = screen_coords[self.selected_vertex]
             drawCircle(point[0], point[1], 3, fill='orange')
 
-        if not edit_mode and self == app.selected_object:
+        if not app.edit_mode and self == app.selected_object:
             for tri in triangles:
                 drawPolygon(*tri['points'], fill=tri['color'],
                             border='orange', borderWidth=0.5)
         else:
             for tri in triangles:
                 drawPolygon(*tri['points'], fill=tri['color'],
-                            opacity=50 if edit_mode else 100)
+                            opacity=50 if app.edit_mode else 100)
 
     def point_over_vertex(self, x, y, threshold=5):
         for point in self.screen_coords:
@@ -144,6 +143,9 @@ class Mesh:
         return min_x <= mouseX <= max_x and min_y <= mouseY <= max_y
 
     def check_vertex_selection(self, mouseX, mouseY, threshold=5):
+        if not self.screen_coords:
+            return
+
         for idx, point in enumerate(self.screen_coords):
             dx = point[0] - mouseX
             dy = point[1] - mouseY
@@ -152,17 +154,22 @@ class Mesh:
                 return
         self.selected_vertex = None
 
-    def transform(self, operation, dx, dy, axis_constraint, camera):
+    def transform(self, app, dx, dy):
+        # Making sure that you can only transform
+        # vertices when in edit mode
+        if not app.edit_mode:
+            self.selected_vertex = None
+
         # Map screen movement to world coordinates
         movement_factor = 0.01  # Adjust as necessary
-        if operation == 'move':
+        if app.transform_mode == 'move':
             move_vector = [dx * movement_factor, -dy *
                            movement_factor, dy * movement_factor]
-            if axis_constraint == 'x':
+            if app.axis_constraint == 'x':
                 move_vector[1] = move_vector[2] = 0
-            elif axis_constraint == 'y':
+            elif app.axis_constraint == 'y':
                 move_vector[0] = move_vector[2] = 0
-            elif axis_constraint == 'z':
+            elif app.axis_constraint == 'z':
                 move_vector[0] = move_vector[1] = 0
             if self.selected_vertex is not None:
                 # Move single vertex
@@ -172,24 +179,24 @@ class Mesh:
             else:
                 # Move entire mesh
                 self.apply_translation(move_vector)
-        elif operation == 'rotate':
+        elif app.transform_mode == 'rotate':
             angle = dx * movement_factor
-            if axis_constraint == 'x':
+            if app.axis_constraint == 'x':
                 axis = [1, 0, 0]
-            elif axis_constraint == 'y':
+            elif app.axis_constraint == 'y':
                 axis = [0, 1, 0]
-            elif axis_constraint == 'z':
+            elif app.axis_constraint == 'z':
                 axis = [0, 0, 1]
             else:
-                axis = camera.get_view_direction()
+                axis = app.camera.get_view_direction()
             self.apply_rotation(angle, axis)
-        elif operation == 'scale':
+        elif app.transform_mode == 'scale':
             scale_factor = 1 + dy * movement_factor
-            if axis_constraint == 'x':
+            if app.axis_constraint == 'x':
                 scale_vector = [scale_factor, 1, 1]
-            elif axis_constraint == 'y':
+            elif app.axis_constraint == 'y':
                 scale_vector = [1, scale_factor, 1]
-            elif axis_constraint == 'z':
+            elif app.axis_constraint == 'z':
                 scale_vector = [1, 1, scale_factor]
             else:
                 scale_vector = [scale_factor, scale_factor, scale_factor]
@@ -282,13 +289,13 @@ class Grid(Mesh):
 
         super().__init__(vertices, indices, is_selectable=False)
 
-    def render(self, app, camera, width, height, edit_mode=False):
+    def render(self, app):
         # The rendering logic is the same as any object in the scene
         # Just the final drawLine call is different
 
         # Transform vertices
         transformed_vertices = [matrix_vector_multiply(
-            camera.projection_view_matrix, v) for v in self.vertices]
+            app.camera.projection_view_matrix, v) for v in self.vertices]
 
         # Perspective division and conversion to NDC
         ndc = []
@@ -300,7 +307,7 @@ class Grid(Mesh):
                            point[3], point[2]/point[3]])
 
         # Screen space conversion
-        screen_coords = [[(x + 1) * (width / 2), (1 - y) * (height / 2)]
+        screen_coords = [[(x + 1) * (app.width / 2), (1 - y) * (app.height / 2)]
                          for x, y, z in ndc]
 
         # Draw grid lines

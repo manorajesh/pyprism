@@ -16,9 +16,9 @@ class Gizmo:
             ([0, 0, 0, 1], [0, 0, size, 1], 'blue'),
         ]
 
-    def render(self, app, camera, width, height, edit_mode=False):
+    def render(self, app):
         gizmo_size_in_pixels = 40
-        offset_x = width - 50 - gizmo_size_in_pixels
+        offset_x = app.width - 50 - gizmo_size_in_pixels
         offset_y = 50
 
         # Draw background circle
@@ -29,9 +29,9 @@ class Gizmo:
         for start, end, color in self.axes:
             # Apply camera transformation for perspective projection
             transformed_start = matrix_vector_multiply(
-                camera.gizmo_projection_view_matrix, start)
+                app.camera.gizmo_projection_view_matrix, start)
             transformed_end = matrix_vector_multiply(
-                camera.gizmo_projection_view_matrix, end)
+                app.camera.gizmo_projection_view_matrix, end)
 
             # Just use transformed start and end points as NDC
             ndc_start = transformed_start

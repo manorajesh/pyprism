@@ -2,6 +2,7 @@ from cmu_graphics import *
 import time
 
 from objects.primatives import *
+from objects.lights import *
 from objects.gizmo import *
 from rendering.camera import *
 from rendering.world import *
@@ -46,10 +47,10 @@ def onAppStart(app):
     app.world.addObject(Grid(size=5))
     app.world.addObject(ImportedMesh("suzanne.obj"))
     # app.world.addObject(Plane())
+    app.world.addObject(PointLight(10))
     app.world.addObject(Gizmo())
 
     app.selected_object = None
-    app.selected_vertex = None
     app.transform_mode = None  # 'move', 'rotate', 'scale'
     app.axis_constraint = None  # 'x', 'y', 'z'
     app.is_transforming = False
@@ -61,8 +62,7 @@ def onMouseMove(app, mouseX, mouseY):
     app.prev_mouse = (mouseX, mouseY)
 
     if app.is_transforming and app.selected_object:
-        app.selected_object.transform(
-            app.transform_mode, dx, dy, app.axis_constraint, app.camera)
+        app.selected_object.transform(app, dx, dy)
 
     if app.is_zooming:
         app.camera.zoom(app, dy)
@@ -78,8 +78,6 @@ def onMousePress(app, mouseX, mouseY):
             if obj.is_editable:
                 obj.check_vertex_selection(mouseX, mouseY)
                 if obj.selected_vertex is not None:
-                    app.selected_object = obj
-                    app.selected_vertex = obj.selected_vertex
                     break
     else:
         # Select mesh
@@ -133,7 +131,7 @@ def onStep(app):
 
 
 def redrawAll(app):
-    app.world.render(app, app.width, app.height, app.edit_mode)
+    app.world.render(app)
 
     drawLabel(f"Frame time: {app.frame_stats.frame_time():.2f}ms", 100, 10)
     drawLabel(f"FPS: {app.frame_stats.fps():.2f}", 100, 25)

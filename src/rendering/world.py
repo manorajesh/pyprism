@@ -12,14 +12,14 @@ class World:
         if obj in self.objects:
             self.objects.remove(obj)
 
-    def render(self, app, width, height, edit_mode=False):
-        if width != self.width or height != self.height:
-            self.camera.resize(width, height)
-            self.width = width
-            self.height = height
+    def render(self, app):
+        if app.width != self.width or app.height != self.height:
+            self.camera.resize(app.width, app.height)
+            self.width = app.width
+            self.height = app.height
 
         for obj in self.objects:
-            obj.render(app, self.camera, width, height, edit_mode)
+            obj.render(app)
 
     def onMouseMove(self, mouseX, mouseY, edit_mode=False):
         if edit_mode:
