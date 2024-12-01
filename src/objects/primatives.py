@@ -30,8 +30,13 @@ class Mesh:
         ) for v in self.vertices]
 
         # Perspective division and conversion to NDC
-        ndc = [[v[0]/v[3], v[1]/v[3], v[2]/v[3]] if v[3] !=
-               0 else [0, 0, 0] for v in transformed_vertices]
+        ndc = []
+        for point in transformed_vertices:
+            if app.is_ortho:
+                ndc.append(point[:3])
+            else:
+                ndc.append([point[0]/point[3], point[1] /
+                           point[3], point[2]/point[3]])
 
         # Screen space conversion
         screen_coords = [[(x + 1) * (width / 2), (1 - y) *
@@ -139,7 +144,6 @@ class Mesh:
         return min_x <= mouseX <= max_x and min_y <= mouseY <= max_y
 
     def check_vertex_selection(self, mouseX, mouseY, threshold=5):
-        print('Checking vertex selection')
         for idx, point in enumerate(self.screen_coords):
             dx = point[0] - mouseX
             dy = point[1] - mouseY
@@ -287,8 +291,13 @@ class Grid(Mesh):
             camera.projection_view_matrix, v) for v in self.vertices]
 
         # Perspective division and conversion to NDC
-        ndc = [[v[0] / v[3], v[1] / v[3], v[2] / v[3]] if v[3] != 0 else [0, 0, 0]
-               for v in transformed_vertices]
+        ndc = []
+        for point in transformed_vertices:
+            if app.is_ortho:
+                ndc.append(point[:3])
+            else:
+                ndc.append([point[0]/point[3], point[1] /
+                           point[3], point[2]/point[3]])
 
         # Screen space conversion
         screen_coords = [[(x + 1) * (width / 2), (1 - y) * (height / 2)]

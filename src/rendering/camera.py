@@ -138,12 +138,19 @@ class Camera:
 
         return [x, y, z]
 
-    def zoom(self, amount):
+    def zoom(self, app, amount):
         # Sensitivity should decrease as the radius decreases
-        sensitivity = 0.001 * self.radius
-        self.radius += amount * sensitivity
-        self.radius = max(0.1, self.radius)
-        self.orbit(0, 0)
+        if app.is_ortho:
+            sensitivity = 0.001 * self.fov
+            self.fov += amount * sensitivity
+            # force perspective matrix recalculation
+            self.resize(app.width, app.height)
+        else:
+            sensitivity = 0.001 * self.radius
+            self.radius += amount * sensitivity
+            self.radius = max(0.1, self.radius)
+            # force perspective update
+            self.orbit(0, 0)
 
     def snap_to_axis(self, axis, target=[0, 0, 0]):
         match axis:

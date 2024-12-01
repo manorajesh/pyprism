@@ -28,6 +28,7 @@ def onAppStart(app):
     app.is_orbiting = False
     app.is_zooming = False
     app.edit_mode = False
+    app.is_ortho = False
     app.prev_mouse = (0, 0)
 
     app.camera = Camera(
@@ -64,7 +65,7 @@ def onMouseMove(app, mouseX, mouseY):
             app.transform_mode, dx, dy, app.axis_constraint, app.camera)
 
     if app.is_zooming:
-        app.camera.zoom(dy)
+        app.camera.zoom(app, dy)
     elif app.is_orbiting:
         app.camera.orbit(-dx, dy)
 
@@ -111,6 +112,8 @@ def onKeyPress(app, key):
             app.is_transforming = True
     elif key in ['x', 'y', 'z'] and app.transform_mode:
         app.axis_constraint = key
+    elif key == '5':
+        app.is_ortho = not app.is_ortho
 
 
 def onKeyRelease(app, key):
