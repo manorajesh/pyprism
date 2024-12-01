@@ -144,3 +144,29 @@ class Camera:
         self.radius += amount * sensitivity
         self.radius = max(0.1, self.radius)
         self.orbit(0, 0)
+
+    def snap_to_axis(self, axis, target=[0, 0, 0]):
+        match axis:
+            case 'x':
+                self.elevation = 0
+                self.azimuth = 45.5
+            case 'y':
+                self.elevation = math.pi/2
+                self.azimuth = 0
+            case 'z':
+                self.elevation = 0
+                self.azimuth = 0
+            case _:
+                raise ValueError('Invalid axis supplied: x, y, z allowed')
+
+        x = target[0] + self.radius * \
+            math.cos(self.elevation) * math.sin(self.azimuth)
+        y = target[1] + self.radius * math.sin(self.elevation)
+        z = target[2] + self.radius * \
+            math.cos(self.elevation) * math.cos(self.azimuth)
+
+        # Update camera position
+        self.x, self.y, self.z = x, y, z
+
+        # Update the view matrix to look at the target
+        self.lookAt([self.x, self.y, self.z], target, [0, 1, 0])
