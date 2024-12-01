@@ -49,8 +49,33 @@ class Mesh:
             v1 = screen_coords[idx1]
             v2 = screen_coords[idx2]
 
-            # Prepare points for drawPolygon
-            points = [v0[0], v0[1], v1[0], v1[1], v2[0], v2[1]]
+            # Calculate center point
+            center = [
+                (v0[0] + v1[0] + v2[0]) / 3,
+                (v0[1] + v1[1] + v2[1]) / 3
+            ]
+
+            # Inset vertices slightly toward center
+            inset = 1.01  # Adjust this value to control gap size
+            v0_inset = [
+                center[0] + (v0[0] - center[0]) * inset,
+                center[1] + (v0[1] - center[1]) * inset,
+                v0[2]
+            ]
+            v1_inset = [
+                center[0] + (v1[0] - center[0]) * inset,
+                center[1] + (v1[1] - center[1]) * inset,
+                v1[2]
+            ]
+            v2_inset = [
+                center[0] + (v2[0] - center[0]) * inset,
+                center[1] + (v2[1] - center[1]) * inset,
+                v2[2]
+            ]
+
+            # Use inset points for drawing
+            points = [v0_inset[0], v0_inset[1], v1_inset[0],
+                      v1_inset[1], v2_inset[0], v2_inset[1]]
 
             # Get world coordinates for normal calculation
             world_v0 = self.vertices[idx0][:3]
@@ -81,18 +106,17 @@ class Mesh:
 
         if edit_mode:
             for point in screen_coords:
-                color = 'orange' if point == self.selected_vertex else 'white'
-                drawCircle(point[0], point[1], 3, fill=color)
+                drawCircle(point[0], point[1], 2, fill='white')
 
         # Highlight selected vertex or mesh
         if edit_mode and self.selected_vertex is not None:
             point = screen_coords[self.selected_vertex]
-            drawCircle(point[0], point[1], 5, fill='yellow')
+            drawCircle(point[0], point[1], 3, fill='orange')
 
         if not edit_mode and self == app.selected_object:
             for tri in triangles:
                 drawPolygon(*tri['points'], fill=tri['color'],
-                            border='yellow', borderWidth=2)
+                            border='orange', borderWidth=0.5)
         else:
             for tri in triangles:
                 drawPolygon(*tri['points'], fill=tri['color'],
@@ -115,6 +139,7 @@ class Mesh:
         return min_x <= mouseX <= max_x and min_y <= mouseY <= max_y
 
     def check_vertex_selection(self, mouseX, mouseY, threshold=5):
+        print('Checking vertex selection')
         for idx, point in enumerate(self.screen_coords):
             dx = point[0] - mouseX
             dy = point[1] - mouseY
@@ -131,10 +156,9 @@ class Mesh:
                            movement_factor, dy * movement_factor]
             if axis_constraint == 'x':
                 move_vector[1] = move_vector[2] = 0
-            elif axis_constraint == 'z':
-                move_vector[0] = move_vector[2] = 0
             elif axis_constraint == 'y':
-                # depth_factor = dy * movement_factor
+                move_vector[0] = move_vector[2] = 0
+            elif axis_constraint == 'z':
                 move_vector[0] = move_vector[1] = 0
             if self.selected_vertex is not None:
                 # Move single vertex
@@ -278,6 +302,9 @@ class Grid(Mesh):
             start_point = screen_coords[idx_start]
             end_point = screen_coords[idx_end]
 
+            # TODO: Issue with start_point and end_point being out of bounds
+            # and too large when camera is zoomed in
+
             # color the two center x and z axis lines red and blue
             if idx_start == 20:
                 drawLine(start_point[0], start_point[1],
@@ -294,7 +321,7 @@ class Grid(Mesh):
 class ImportedMesh(Mesh):
     def __init__(self, file_path, shading_model=Lambertian()):
         vertices, indices = self.load_obj(file_path)
-        super().__init__(vertices, indices, shading_model)
+        super().__init__(vertices, indices, shading_model, is_editable=True)
 
     @staticmethod
     def load_obj(file_path):

@@ -43,8 +43,8 @@ def onAppStart(app):
     app.world = World(app.camera, app.width, app.height)
 
     app.world.addObject(Grid(size=5))
-    # app.world.addObject(ImportedMesh("suzanne.obj"))
-    app.world.addObject(Plane())
+    app.world.addObject(ImportedMesh("suzanne.obj"))
+    # app.world.addObject(Plane())
     app.world.addObject(Gizmo())
 
     app.selected_object = None
@@ -132,21 +132,19 @@ def redrawAll(app):
     app.world.render(app, app.width, app.height, app.edit_mode)
 
     drawLabel(f"Frame time: {app.frame_stats.frame_time():.2f}ms", 100, 10)
-    drawLabel(f"FPS: {app.frame_stats.fps():.2f}", 100, 20)
+    drawLabel(f"FPS: {app.frame_stats.fps():.2f}", 100, 25)
     if app.edit_mode:
-        drawLabel("Edit Mode", 100, 30, fill='red')
+        drawLabel("Edit Mode", 100, 40, fill='red')
     if app.selected_object:
-        drawLabel(f"Selected: {type(app.selected_object).__name__}", 100, 50)
-    if app.selected_vertex:
-        drawLabel(f"Selected Vertex: {app.selected_vertex}", 100, 70)
+        drawLabel(f"Selected: {type(app.selected_object).__name__}", 100, 55)
     if app.transform_mode:
-        drawLabel(f"Transform Mode: {app.transform_mode}", 100, 90)
+        drawLabel(f"Transform Mode: {app.transform_mode}", 100, 70)
     if app.axis_constraint:
-        drawLabel(f"Axis Constraint: {app.axis_constraint}", 100, 110)
+        drawLabel(f"Axis Constraint: {app.axis_constraint}", 100, 80)
 
 
 def main():
-    runApp(width=1000, height=1000)
+    runApp(width=1250, height=800)
 
 
 if __name__ == "__main__":
