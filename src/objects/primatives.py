@@ -196,3 +196,33 @@ class Grid(Mesh):
                 drawLine(start_point[0], start_point[1],
                          end_point[0], end_point[1],
                          fill=rgb(50, 50, 50))
+
+
+class ImportedMesh(Mesh):
+    def __init__(self, file_path, shading_model=Lambertian()):
+        vertices, indices = self.load_obj(file_path)
+        super().__init__(vertices, indices, shading_model)
+
+    @staticmethod
+    def load_obj(file_path):
+        vertices = []
+        indices = []
+
+        with open(file_path, 'r') as f:
+            for line in f:
+                if line.startswith('v '):  # vertices
+                    parts = line.strip().split()
+                    x, y, z = map(float, parts[1:4])
+                    # Add homogeneous coordinate w=1
+                    vertices.append([x, y, z, 1])
+                elif line.startswith('f '):  # face info/indices
+                    parts = line.strip().split()
+                    # obj file indices start from 1 so we subtract 1
+                    face_indices = [int(part.split('/')[0]) -
+                                    1 for part in parts[1:]]
+                    if len(face_indices) == 3:
+                        indices.extend(face_indices)
+                    elif len(face_indices) > 3:
+                        raise ValueError(
+                            'Only triangles are supported for now')
+        return vertices, indices

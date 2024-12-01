@@ -18,6 +18,7 @@ class FrameTime:
 
 
 def onAppStart(app):
+    app.setMaxShapeCount(2000000)
     app.background = rgb(64, 64, 64)
     app.frame_time = FrameTime()
     app.is_orbiting = False
@@ -38,7 +39,8 @@ def onAppStart(app):
     app.world = World(app.camera, app.width, app.height)
 
     app.world.addObject(Grid(size=5))
-    app.world.addObject(Cube())
+    app.world.addObject(ImportedMesh("teapot.obj"))
+    # app.world.addObject(Cube())
     app.world.addObject(Gizmo())
 
 
