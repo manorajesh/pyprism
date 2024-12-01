@@ -4,7 +4,7 @@ from rendering.shading import *
 
 
 class Mesh:
-    def __init__(self, vertices, indices, shading_model=Lambertian(), is_editable=False):
+    def __init__(self, vertices, indices, shading_model=Lambertian(), is_editable=False, is_selectable=True):
         self.vertices = vertices  # List of [x,y,z,w] vertices
         self.indices = indices    # List of triangle indices
         self.shading_model = shading_model
@@ -15,14 +15,19 @@ class Mesh:
         self.selected_vertex = None
 
         self.is_editable = is_editable
+        self.is_selectable = is_selectable
+        self.selected_vertex = None
+        self.transform_matrix = identity_matrix()
 
-    def render(self, camera, width, height, edit_mode=False):
+    def render(self, app, camera, width, height, edit_mode=False):
         # Perspective projection
         # https://www.scratchapixel.com/lessons/3d-basic-rendering/perspective-and-orthographic-projection-matrix/building-basic-perspective-projection-matrix.html
 
-        # Transform vertices to clip space
+        # Apply transformations to vertices
         transformed_vertices = [matrix_vector_multiply(
-            camera.projection_view_matrix, v) for v in self.vertices]
+            camera.projection_view_matrix,
+            matrix_vector_multiply(self.transform_matrix, v)
+        ) for v in self.vertices]
 
         # Perspective division and conversion to NDC
         ndc = [[v[0]/v[3], v[1]/v[3], v[2]/v[3]] if v[3] !=
@@ -79,14 +84,102 @@ class Mesh:
                 color = 'orange' if point == self.selected_vertex else 'white'
                 drawCircle(point[0], point[1], 3, fill=color)
 
-        for tri in triangles:
-            drawPolygon(*tri['points'], fill=tri['color'],
-                        opacity=50 if edit_mode else 100)
+        # Highlight selected vertex or mesh
+        if edit_mode and self.selected_vertex is not None:
+            point = screen_coords[self.selected_vertex]
+            drawCircle(point[0], point[1], 5, fill='yellow')
+
+        if not edit_mode and self == app.selected_object:
+            for tri in triangles:
+                drawPolygon(*tri['points'], fill=tri['color'],
+                            border='yellow', borderWidth=2)
+        else:
+            for tri in triangles:
+                drawPolygon(*tri['points'], fill=tri['color'],
+                            opacity=50 if edit_mode else 100)
 
     def point_over_vertex(self, x, y, threshold=5):
         for point in self.screen_coords:
             if abs(point[0] - x) < threshold and abs(point[1] - y) < threshold:
                 self.selected_vertex = point
+
+    def check_selection(self, mouseX, mouseY):
+        if not self.screen_coords:
+            return False
+
+        # Simple bounding box check
+        min_x = min(point[0] for point in self.screen_coords)
+        max_x = max(point[0] for point in self.screen_coords)
+        min_y = min(point[1] for point in self.screen_coords)
+        max_y = max(point[1] for point in self.screen_coords)
+        return min_x <= mouseX <= max_x and min_y <= mouseY <= max_y
+
+    def check_vertex_selection(self, mouseX, mouseY, threshold=5):
+        for idx, point in enumerate(self.screen_coords):
+            dx = point[0] - mouseX
+            dy = point[1] - mouseY
+            if dx * dx + dy * dy < threshold * threshold:
+                self.selected_vertex = idx
+                return
+        self.selected_vertex = None
+
+    def transform(self, operation, dx, dy, axis_constraint, camera):
+        # Map screen movement to world coordinates
+        movement_factor = 0.01  # Adjust as necessary
+        if operation == 'move':
+            move_vector = [dx * movement_factor, -dy *
+                           movement_factor, dy * movement_factor]
+            if axis_constraint == 'x':
+                move_vector[1] = move_vector[2] = 0
+            elif axis_constraint == 'z':
+                move_vector[0] = move_vector[2] = 0
+            elif axis_constraint == 'y':
+                # depth_factor = dy * movement_factor
+                move_vector[0] = move_vector[1] = 0
+            if self.selected_vertex is not None:
+                # Move single vertex
+                idx = self.selected_vertex
+                self.vertices[idx] = vector_add(
+                    self.vertices[idx], move_vector + [0])
+            else:
+                # Move entire mesh
+                self.apply_translation(move_vector)
+        elif operation == 'rotate':
+            angle = dx * movement_factor
+            if axis_constraint == 'x':
+                axis = [1, 0, 0]
+            elif axis_constraint == 'y':
+                axis = [0, 1, 0]
+            elif axis_constraint == 'z':
+                axis = [0, 0, 1]
+            else:
+                axis = camera.get_view_direction()
+            self.apply_rotation(angle, axis)
+        elif operation == 'scale':
+            scale_factor = 1 + dy * movement_factor
+            if axis_constraint == 'x':
+                scale_vector = [scale_factor, 1, 1]
+            elif axis_constraint == 'y':
+                scale_vector = [1, scale_factor, 1]
+            elif axis_constraint == 'z':
+                scale_vector = [1, 1, scale_factor]
+            else:
+                scale_vector = [scale_factor, scale_factor, scale_factor]
+            self.apply_scaling(scale_vector)
+
+    def apply_translation(self, move_vector):
+        translation = translation_matrix(*move_vector)
+        self.transform_matrix = matrix_multiply(
+            translation, self.transform_matrix)
+
+    def apply_rotation(self, angle, axis):
+        rotation = rotation_matrix(angle, axis)
+        self.transform_matrix = matrix_multiply(
+            rotation, self.transform_matrix)
+
+    def apply_scaling(self, scale_vector):
+        scaling = scaling_matrix(*scale_vector)
+        self.transform_matrix = matrix_multiply(scaling, self.transform_matrix)
 
 
 class Cube(Mesh):
@@ -161,7 +254,7 @@ class Grid(Mesh):
 
         super().__init__(vertices, indices)
 
-    def render(self, camera, width, height, edit_mode=False):
+    def render(self, app, camera, width, height, edit_mode=False):
         # The rendering logic is the same as any object in the scene
         # Just the final drawLine call is different
 

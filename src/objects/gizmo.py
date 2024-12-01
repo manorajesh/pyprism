@@ -3,8 +3,9 @@ from matrix_util import *
 
 
 class Gizmo:
-    def __init__(self, size=1.0, is_editable=False):
-        self.is_editable = is_editable
+    def __init__(self, size=1.0):
+        self.is_editable = False
+        self.is_selectable = False
         self.size = size
         self.axes = [
             # X-axis
@@ -15,7 +16,7 @@ class Gizmo:
             ([0, 0, 0, 1], [0, 0, size, 1], 'blue'),
         ]
 
-    def render(self, camera, width, height, edit_mode=False):
+    def render(self, app, camera, width, height, edit_mode=False):
         gizmo_size_in_pixels = 40
         offset_x = width - 50 - gizmo_size_in_pixels
         offset_y = 50

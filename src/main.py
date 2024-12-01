@@ -7,20 +7,24 @@ from rendering.camera import *
 from rendering.world import *
 
 
-class FrameTime:
+class FrameStats:
     def __init__(self):
-        self.now = time.time()
+        self.last_time = time.time()
 
-    def get(self):
-        frame_time = (time.time() - self.now) * 1000
-        self.now = time.time()
+    def frame_time(self):
+        now = time.time()
+        frame_time = (now - self.last_time) * 1000
+        self.last_time = now
         return frame_time
+
+    def fps(self):
+        return 1 / (self.frame_time())
 
 
 def onAppStart(app):
     app.setMaxShapeCount(2000000)
     app.background = rgb(64, 64, 64)
-    app.frame_time = FrameTime()
+    app.frame_stats = FrameStats()
     app.is_orbiting = False
     app.is_zooming = False
     app.edit_mode = False
@@ -39,9 +43,15 @@ def onAppStart(app):
     app.world = World(app.camera, app.width, app.height)
 
     app.world.addObject(Grid(size=5))
-    app.world.addObject(ImportedMesh("teapot.obj"))
-    # app.world.addObject(Cube())
+    # app.world.addObject(ImportedMesh("suzanne.obj"))
+    app.world.addObject(Plane())
     app.world.addObject(Gizmo())
+
+    app.selected_object = None
+    app.selected_vertex = None
+    app.transform_mode = None  # 'move', 'rotate', 'scale'
+    app.axis_constraint = None  # 'x', 'y', 'z'
+    app.is_transforming = False
 
 
 def onMouseMove(app, mouseX, mouseY):
@@ -49,31 +59,69 @@ def onMouseMove(app, mouseX, mouseY):
     dy = mouseY - app.prev_mouse[1]
     app.prev_mouse = (mouseX, mouseY)
 
+    if app.is_transforming and app.selected_object:
+        app.selected_object.transform(
+            app.transform_mode, dx, dy, app.axis_constraint, app.camera)
+
     if app.is_zooming:
         app.camera.zoom(dy)
     elif app.is_orbiting:
         app.camera.orbit(-dx, dy)
+
+
+def onMousePress(app, mouseX, mouseY):
+    app.prev_mouse = (mouseX, mouseY)
+    if app.edit_mode:
+        # Select vertex
+        for obj in app.world.objects:
+            if obj.is_editable:
+                obj.check_vertex_selection(mouseX, mouseY)
+                if obj.selected_vertex is not None:
+                    app.selected_object = obj
+                    app.selected_vertex = obj.selected_vertex
+                    break
     else:
-        app.world.onMouseMove(mouseX, mouseY, app.edit_mode)
+        # Select mesh
+        for obj in reversed(app.world.objects):  # Check from topmost object
+            if obj.is_selectable and obj.check_selection(mouseX, mouseY):
+                app.selected_object = obj
+                break
+            else:
+                app.selected_object = None
 
 
 def onKeyPress(app, key):
     if key == 'space':
         app.is_orbiting = True
-
-    if key == 'z':
+    elif key == 'q':
         app.is_zooming = True
-
-    if key == 'tab':
+    elif key == 'tab':
         app.edit_mode = not app.edit_mode
+    elif key == 'g':
+        if app.selected_object:
+            app.transform_mode = 'move'
+            app.is_transforming = True
+    elif key == 'r':
+        if app.selected_object:
+            app.transform_mode = 'rotate'
+            app.is_transforming = True
+    elif key == 's':
+        if app.selected_object:
+            app.transform_mode = 'scale'
+            app.is_transforming = True
+    elif key in ['x', 'y', 'z'] and app.transform_mode:
+        app.axis_constraint = key
 
 
 def onKeyRelease(app, key):
     if key == 'space':
         app.is_orbiting = False
-
-    if key == 'z':
+    elif key == 'q':
         app.is_zooming = False
+    elif key in ['g', 'r', 's']:
+        app.transform_mode = None
+        app.is_transforming = False
+        app.axis_constraint = None
 
 
 def onStep(app):
@@ -81,10 +129,20 @@ def onStep(app):
 
 
 def redrawAll(app):
-    drawLabel(f"Frame time: {app.frame_time.get():.2f}ms", 100, 10)
+    app.world.render(app, app.width, app.height, app.edit_mode)
+
+    drawLabel(f"Frame time: {app.frame_stats.frame_time():.2f}ms", 100, 10)
+    drawLabel(f"FPS: {app.frame_stats.fps():.2f}", 100, 20)
     if app.edit_mode:
         drawLabel("Edit Mode", 100, 30, fill='red')
-    app.world.render(app.width, app.height, app.edit_mode)
+    if app.selected_object:
+        drawLabel(f"Selected: {type(app.selected_object).__name__}", 100, 50)
+    if app.selected_vertex:
+        drawLabel(f"Selected Vertex: {app.selected_vertex}", 100, 70)
+    if app.transform_mode:
+        drawLabel(f"Transform Mode: {app.transform_mode}", 100, 90)
+    if app.axis_constraint:
+        drawLabel(f"Axis Constraint: {app.axis_constraint}", 100, 110)
 
 
 def main():

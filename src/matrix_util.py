@@ -50,3 +50,51 @@ def normalize(v):
 
 def dot(a, b):
     return sum([a[i] * b[i] for i in range(len(a))])
+
+
+def identity_matrix():
+    return [
+        [1, 0, 0, 0],
+        [0, 1, 0, 0],
+        [0, 0, 1, 0],
+        [0, 0, 0, 1]
+    ]
+
+
+def translation_matrix(tx, ty, tz):
+    return [
+        [1, 0, 0, tx],
+        [0, 1, 0, ty],
+        [0, 0, 1, tz],
+        [0, 0, 0, 1]
+    ]
+
+
+def rotation_matrix(angle, axis):
+    # Normalize axis
+    axis = normalize(axis)
+    x, y, z = axis
+
+    c = math.cos(angle)
+    s = math.sin(angle)
+    t = 1 - c
+
+    return [
+        [t*x*x + c,   t*x*y - z*s, t*x*z + y*s, 0],
+        [t*x*y + z*s, t*y*y + c,   t*y*z - x*s, 0],
+        [t*x*z - y*s, t*y*z + x*s, t*z*z + c,   0],
+        [0,          0,           0,           1]
+    ]
+
+
+def scaling_matrix(sx, sy, sz):
+    return [
+        [sx, 0,  0,  0],
+        [0,  sy, 0,  0],
+        [0,  0,  sz, 0],
+        [0,  0,  0,  1]
+    ]
+
+
+def vector_add(a, b):
+    return [a[i] + b[i] for i in range(len(a))]
