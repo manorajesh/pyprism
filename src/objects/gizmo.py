@@ -29,9 +29,9 @@ class Gizmo:
         for start, end, color in self.axes:
             # Apply camera transformation for perspective projection
             transformed_start = matrix_vector_multiply(
-                camera.projection_view_matrix, start)
+                camera.gizmo_projection_view_matrix, start)
             transformed_end = matrix_vector_multiply(
-                camera.projection_view_matrix, end)
+                camera.gizmo_projection_view_matrix, end)
 
             # Just use transformed start and end points as NDC
             ndc_start = transformed_start

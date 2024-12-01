@@ -114,6 +114,7 @@ def onKeyPress(app, key):
         app.axis_constraint = key
     elif key == '5':
         app.is_ortho = not app.is_ortho
+        app.camera.is_ortho(app)
 
 
 def onKeyRelease(app, key):

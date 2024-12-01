@@ -280,7 +280,7 @@ class Grid(Mesh):
             vertices.append([half_size, 0, position, 1])   # End point
             indices.extend([len(vertices) - 2, len(vertices) - 1])
 
-        super().__init__(vertices, indices)
+        super().__init__(vertices, indices, is_selectable=False)
 
     def render(self, app, camera, width, height, edit_mode=False):
         # The rendering logic is the same as any object in the scene

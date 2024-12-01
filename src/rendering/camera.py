@@ -12,6 +12,7 @@ class Camera:
         self.y = y
         self.z = z
         self.fov = fov
+        self.prev_fov = fov
         self.aspect_ratio = aspect_ratio
         self.near = near
         self.far = far
@@ -42,6 +43,10 @@ class Camera:
 
         self.projection_view_matrix = matrix_multiply(
             self.perspective_matrix, self.view_matrix)
+
+        # so that gizmo rendering is always orthographic and at a stable fov
+        self.gizmo_projection_view_matrix = self.projection_view_matrix
+        self.gizmo_perspective_matrix = self.perspective_matrix
 
     def move(self, x, y, z):
         self.x += x
@@ -118,6 +123,9 @@ class Camera:
         self.projection_view_matrix = matrix_multiply(
             self.perspective_matrix, self.view_matrix)
 
+        self.gizmo_projection_view_matrix = matrix_multiply(
+            self.gizmo_perspective_matrix, self.view_matrix)
+
     def position(self):
         return [self.x, self.y, self.z]
 
@@ -139,10 +147,13 @@ class Camera:
         return [x, y, z]
 
     def zoom(self, app, amount):
+        print(self.radius, self.fov)
         # Sensitivity should decrease as the radius decreases
         if app.is_ortho:
             sensitivity = 0.001 * self.fov
             self.fov += amount * sensitivity
+            self.fov = min(180, self.fov)
+            self.fov = max(2, self.fov)
             # force perspective matrix recalculation
             self.resize(app.width, app.height)
         else:
@@ -177,3 +188,12 @@ class Camera:
 
         # Update the view matrix to look at the target
         self.lookAt([self.x, self.y, self.z], target, [0, 1, 0])
+
+    def is_ortho(self, app):
+        if app.is_ortho:
+            self.prev_fov = self.fov
+            self.fov = self.radius * 25
+        else:
+            self.fov = self.prev_fov
+
+        self.resize(app.width, app.height)
