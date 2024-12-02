@@ -53,6 +53,7 @@ def onAppStart(app):
     app.transform_mode = None  # 'move', 'rotate', 'scale'
     app.axis_constraint = None  # 'x', 'y', 'z'
     app.is_transforming = False
+    app.selection_mode = 'vertex'  # or 'face'
 
 
 def onMouseMove(app, mouseX, mouseY):
@@ -72,12 +73,16 @@ def onMouseMove(app, mouseX, mouseY):
 def onMousePress(app, mouseX, mouseY):
     app.prev_mouse = (mouseX, mouseY)
     if app.edit_mode:
-        # Select vertex
         for obj in app.world.objects:
             if obj.is_editable:
-                obj.check_vertex_selection(mouseX, mouseY)
-                if obj.selected_vertex is not None:
-                    break
+                if obj.selection_mode == 'vertex':
+                    if obj.check_vertex_selection(mouseX, mouseY):
+                        app.selected_object = obj
+                        break
+                else:  # face selection mode
+                    if obj.check_face_selection(mouseX, mouseY):
+                        app.selected_object = obj
+                        break
     else:
         # Select mesh
         for obj in reversed(app.world.objects):  # Check from topmost object
@@ -112,6 +117,14 @@ def onKeyPress(app, key):
     elif key == '5':
         app.is_ortho = not app.is_ortho
         app.camera.is_ortho(app)
+    elif key == '1':  # Add these new controls
+        if app.selected_object:
+            app.selected_object.selection_mode = 'vertex'
+            app.selected_object.selected_face = None
+    elif key == '2':
+        if app.selected_object:
+            app.selected_object.selection_mode = 'face'
+            app.selected_object.selected_vertice = None
 
 
 def onKeyRelease(app, key):
@@ -142,6 +155,9 @@ def redrawAll(app):
         drawLabel(f"Transform Mode: {app.transform_mode}", 100, 70)
     if app.axis_constraint:
         drawLabel(f"Axis Constraint: {app.axis_constraint}", 100, 80)
+    if app.selected_object:
+        drawLabel(f"Selection Mode: {
+                  app.selected_object.selection_mode}", 100, 90)
 
 
 def main():

@@ -11,6 +11,7 @@ class Light():
         self.z = z
         self.is_selectable = True
         self.is_editable = False
+        self.selection_mode = 'vertex'
         self.screen_coords = None
 
     def get_view_direction(self):

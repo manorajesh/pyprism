@@ -1,4 +1,3 @@
-
 from matrix_util import *
 from cmu_graphics import *
 from rendering.shading import *
@@ -18,6 +17,8 @@ class Mesh:
         self.is_selectable = is_selectable
         self.selected_vertex = None
         self.transform_matrix = identity_matrix()
+        self.selection_mode = 'vertex'  # 'vertex' or 'face'
+        self.selected_face = None
 
     def render(self, app):
         # Perspective projection
@@ -120,7 +121,7 @@ class Mesh:
                 tri['opacity'] = 50
 
         # Draw vertices in edit mode
-        if app.edit_mode:
+        if app.edit_mode and self.selection_mode == 'vertex':
             for point in screen_coords:
                 drawCircle(point[0], point[1], 2, fill='white')
 
@@ -128,6 +129,19 @@ class Mesh:
         if app.edit_mode and self.selected_vertex is not None:
             point = screen_coords[self.selected_vertex]
             drawCircle(point[0], point[1], 3, fill='orange')
+
+        # Highlight selected face
+        if app.edit_mode and self.selection_mode == 'face' and self.selected_face is not None:
+            idx0 = self.indices[self.selected_face]
+            idx1 = self.indices[self.selected_face + 1]
+            idx2 = self.indices[self.selected_face + 2]
+
+            v0 = screen_coords[idx0]
+            v1 = screen_coords[idx1]
+            v2 = screen_coords[idx2]
+
+            points = [v0[0], v0[1], v1[0], v1[1], v2[0], v2[1]]
+            drawPolygon(*points, fill=None, border='orange', borderWidth=2)
 
         return triangles
 
@@ -148,7 +162,7 @@ class Mesh:
         return min_x <= mouseX <= max_x and min_y <= mouseY <= max_y
 
     def check_vertex_selection(self, mouseX, mouseY, threshold=5):
-        if not self.screen_coords:
+        if not self.screen_coords or self.selection_mode != 'vertex':
             return
 
         for idx, point in enumerate(self.screen_coords):
@@ -159,11 +173,41 @@ class Mesh:
                 return
         self.selected_vertex = None
 
+    def check_face_selection(self, mouseX, mouseY):
+        if not self.screen_coords or self.selection_mode != 'face':
+            return False
+
+        for i in range(0, len(self.indices), 3):
+            idx0 = self.indices[i]
+            idx1 = self.indices[i+1]
+            idx2 = self.indices[i+2]
+
+            v0 = self.screen_coords[idx0]
+            v1 = self.screen_coords[idx1]
+            v2 = self.screen_coords[idx2]
+
+            # Use the point_in_triangle function from matrix_util
+            if point_in_triangle(mouseX, mouseY,
+                                 (v0[0], v0[1]),
+                                 (v1[0], v1[1]),
+                                 (v2[0], v2[1])):
+                if i == self.selected_face:
+                    self.selected_face = None  # Deselect if clicking same face
+                else:
+                    self.selected_face = i    # Select new face
+                return True
+
+        self.selected_face = None
+        return False
+
     def transform(self, app, dx, dy):
         # Making sure that you can only transform
         # vertices when in edit mode
-        if not app.edit_mode:
+        if not app.edit_mode or self.selection_mode == 'face':
             self.selected_vertex = None
+
+        if not app.edit_mode or self.selection_mode == 'vertex':
+            self.selected_face = None
 
         # Map screen movement to world coordinates
         movement_factor = 0.01  # Adjust as necessary
@@ -176,11 +220,20 @@ class Mesh:
                 move_vector[0] = move_vector[2] = 0
             elif app.axis_constraint == 'z':
                 move_vector[0] = move_vector[1] = 0
-            if self.selected_vertex is not None:
+            if self.selection_mode == 'vertex' and self.selected_vertex is not None:
                 # Move single vertex
                 idx = self.selected_vertex
                 self.vertices[idx] = vector_add(
                     self.vertices[idx], move_vector + [0])
+            elif self.selection_mode == 'face' and self.selected_face:
+                # Move vertices of selected faces
+                affected_vertices = set()
+                for i in range(3):
+                    affected_vertices.add(self.indices[self.selected_face + i])
+
+                for vertex_idx in affected_vertices:
+                    self.vertices[vertex_idx] = vector_add(
+                        self.vertices[vertex_idx], move_vector + [0])
             else:
                 # Move entire mesh
                 self.apply_translation(move_vector)

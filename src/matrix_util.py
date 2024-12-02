@@ -98,3 +98,19 @@ def scaling_matrix(sx, sy, sz):
 
 def vector_add(a, b):
     return [a[i] + b[i] for i in range(len(a))]
+
+
+def point_in_triangle(px, py, v1, v2, v3):
+    def area(x1, y1, x2, y2, x3, y3):
+        return abs((x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2))/2.0)
+
+    # Calculate area of the entire triangle
+    total_area = area(v1[0], v1[1], v2[0], v2[1], v3[0], v3[1])
+
+    # Calculate areas of three triangles made between the point and triangle vertices
+    area1 = area(px, py, v2[0], v2[1], v3[0], v3[1])
+    area2 = area(v1[0], v1[1], px, py, v3[0], v3[1])
+    area3 = area(v1[0], v1[1], v2[0], v2[1], px, py)
+
+    # Point is inside if sum of three areas equals total area
+    return abs(total_area - (area1 + area2 + area3)) < 0.0001
