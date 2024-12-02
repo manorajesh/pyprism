@@ -62,6 +62,7 @@ class Mesh:
             ]
 
             # Inset vertices slightly away from center
+            # to avoid z-fighting (overlapping triangles)
             inset = 1.01
             v0_inset = [
                 center[0] + (v0[0] - center[0]) * inset,
@@ -107,7 +108,8 @@ class Mesh:
             triangles.append(
                 {'depth': avg_depth, 'points': points, 'color': color})
 
-        triangles.sort(key=lambda tri: tri['depth'], reverse=True)
+        # Already sorted by world render
+        # triangles.sort(key=lambda tri: tri['depth'], reverse=True)
 
         self.screen_coords = screen_coords
 
@@ -210,7 +212,7 @@ class Mesh:
             self.selected_face = None
 
         # Map screen movement to world coordinates
-        movement_factor = 0.01  # Adjust as necessary
+        movement_factor = 0.01
         if app.transform_mode == 'move':
             move_vector = [dx * movement_factor, -dy *
                            movement_factor, -dx * movement_factor]
@@ -399,6 +401,7 @@ class ImportedMesh(Mesh):
 
     @staticmethod
     def load_obj(file_path):
+        # https://cs418.cs.illinois.edu/website/text/obj.html
         vertices = []
         indices = []
 

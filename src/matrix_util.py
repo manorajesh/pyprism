@@ -71,23 +71,52 @@ def translation_matrix(tx, ty, tz):
 
 
 def rotation_matrix(angle, axis):
-    # Normalize axis
+    # https://math.libretexts.org/Bookshelves/Applied_Mathematics/Mathematics_for_Game_Developers_(Burzynski)/04%3A_Matrices/4.06%3A_Rotation_Matrices_in_3-Dimensions
+    def rotation_x(angle):
+        c = math.cos(angle)
+        s = math.sin(angle)
+        return [
+            [1, 0,  0, 0],
+            [0, c, -s, 0],
+            [0, s,  c, 0],
+            [0, 0,  0, 1]
+        ]
+
+    def rotation_y(angle):
+        c = math.cos(angle)
+        s = math.sin(angle)
+        return [
+            [c, 0, s, 0],
+            [0, 1, 0, 0],
+            [-s, 0, c, 0],
+            [0, 0, 0, 1]
+        ]
+
+    def rotation_z(angle):
+        c = math.cos(angle)
+        s = math.sin(angle)
+        return [
+            [c, -s, 0, 0],
+            [s,  c, 0, 0],
+            [0,  0, 1, 0],
+            [0,  0, 0, 1]
+        ]
+
+    # Normalize axis to get components
     axis = normalize(axis)
     x, y, z = axis
 
-    c = math.cos(angle)
-    s = math.sin(angle)
-    t = 1 - c
+    # Get rotation matrix for each axis and scale by component
+    rx = rotation_x(angle * x)
+    ry = rotation_y(angle * y)
+    rz = rotation_z(angle * z)
 
-    return [
-        [t*x*x + c,   t*x*y - z*s, t*x*z + y*s, 0],
-        [t*x*y + z*s, t*y*y + c,   t*y*z - x*s, 0],
-        [t*x*z - y*s, t*y*z + x*s, t*z*z + c,   0],
-        [0,          0,           0,           1]
-    ]
+    # Combine rotations (order matters: Z * Y * X)
+    return matrix_multiply(rz, matrix_multiply(ry, rx))
 
 
 def scaling_matrix(sx, sy, sz):
+    # https://en.wikipedia.org/wiki/Scaling_(geometry)
     return [
         [sx, 0,  0,  0],
         [0,  sy, 0,  0],
@@ -101,6 +130,7 @@ def vector_add(a, b):
 
 
 def point_in_triangle(px, py, v1, v2, v3):
+    # https://www.geeksforgeeks.org/check-whether-a-given-point-lies-inside-a-triangle-or-not/
     def area(x1, y1, x2, y2, x3, y3):
         return abs((x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2))/2.0)
 

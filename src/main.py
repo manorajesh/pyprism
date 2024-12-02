@@ -46,7 +46,7 @@ def onAppStart(app):
 
     app.world.add_object(Grid(size=5))
     app.world.add_object(PointLight(10))
-    app.world.add_object(ImportedMesh("suzanne.obj"))
+    app.world.add_object(ImportedMesh("teapot.obj"))
     app.world.add_object(Gizmo())
 
     app.selected_object = None
@@ -114,6 +114,12 @@ def onKeyPress(app, key, modifiers):
             app.is_transforming = True
     elif key in ['x', 'y', 'z'] and app.transform_mode:
         app.axis_constraint = key
+    elif key == 'x':
+        app.camera.snap_to_axis('x')
+    elif key == 'y':
+        app.camera.snap_to_axis('y')
+    elif key == 'z':
+        app.camera.snap_to_axis('z')
     elif key == '5':
         app.is_ortho = not app.is_ortho
         app.camera.is_ortho(app)
@@ -132,7 +138,6 @@ def onKeyPress(app, key, modifiers):
         app.axis_constraint = None
         app.is_transforming = False
     elif key == 'A' and 'shift' in modifiers:
-        print("Adding a point")
         app.world.add_object(ImportedMesh("suzanne.obj"))
 
 

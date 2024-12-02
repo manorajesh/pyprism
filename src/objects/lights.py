@@ -1,5 +1,4 @@
 from matrix_util import *
-from objects.primatives import Mesh
 from cmu_graphics import *
 
 
@@ -72,13 +71,16 @@ class PointLight(Light):
         return triangles
 
     def check_selection(self, mouseX, mouseY):
+        # Assume circular selection area
         if not self.screen_coords:
             return False
 
-        if self.screen_coords[0] - 10 <= mouseX <= self.screen_coords[0] + 10 and self.screen_coords[1] - 10 <= mouseY <= self.screen_coords[1] + 10:
+        if self.screen_coords[0] - 10 <= mouseX <= self.screen_coords[0] + 10 \
+                and self.screen_coords[1] - 10 <= mouseY <= self.screen_coords[1] + 10:
             return True
 
     def transform(self, app, dx, dy):
+        # Same as mesh transform
         movement_factor = 0.01  # Adjust as necessary
         if app.transform_mode == 'move':
             move_vector = [dx * movement_factor, -dy *
