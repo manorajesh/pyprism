@@ -93,7 +93,7 @@ def onMousePress(app, mouseX, mouseY):
                 app.selected_object = None
 
 
-def onKeyPress(app, key):
+def onKeyPress(app, key, modifiers):
     if key == 'space':
         app.is_orbiting = True
     elif key == 'q':
@@ -125,6 +125,15 @@ def onKeyPress(app, key):
         if app.selected_object:
             app.selected_object.selection_mode = 'face'
             app.selected_object.selected_vertice = None
+    elif key == 'backspace':
+        app.world.remove_object(app.selected_object)
+        app.selected_object = None
+        app.transform_mode = None
+        app.axis_constraint = None
+        app.is_transforming = False
+    elif key == 'A' and 'shift' in modifiers:
+        print("Adding a point")
+        app.world.add_object(ImportedMesh("suzanne.obj"))
 
 
 def onKeyRelease(app, key):

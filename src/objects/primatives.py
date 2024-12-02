@@ -117,11 +117,11 @@ class Mesh:
             if not app.edit_mode and self == app.selected_object:
                 tri['border'] = 'orange'
                 tri['borderWidth'] = 0.5
-            elif app.edit_mode:
+            elif app.edit_mode and app.selected_object == self:
                 tri['opacity'] = 50
 
         # Draw vertices in edit mode
-        if app.edit_mode and self.selection_mode == 'vertex':
+        if app.edit_mode and self.selection_mode == 'vertex' and app.selected_object == self:
             for point in screen_coords:
                 drawCircle(point[0], point[1], 2, fill='white')
 
