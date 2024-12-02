@@ -34,6 +34,7 @@ class Gizmo:
                 app.camera.gizmo_projection_view_matrix, end)
 
             # Just use transformed start and end points as NDC
+            # for orthographic projection
             ndc_start = transformed_start
             ndc_end = transformed_end
 
