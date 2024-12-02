@@ -8,7 +8,7 @@ In addition to a functional 3D modeling environment that allows users to create 
 
 Key features of the project include:
 
-- **3D Object Rendering:** Ability to render primative 3D objects like planes and cubes.
+- **3D Object Rendering:** Ability to render primative 3D objects like planes and cubes. Also be able to import `.obj` files.
 - **3D Modeling:** Ability to create and manipulate 3D objects in a 3D space.
 - **Interactive Camera Control:** Users can navigate/interact with the 3D space using the keyboard and mouse.
 - **Path-Traced Renderer:** Realistic lighting simulation.
@@ -38,7 +38,7 @@ Key features of the project include:
 
 **Git** will be the main version control for this project. All project files will be hosted on **GitHub** alongside local backups. Regular commits will be made to track project progress and ease development.
 
-![Github Screenshot](https://github.com/manorajesh/pyprism/blob/master/images/repo.png)
+![Github Screenshot](https://github.com/manorajesh/pyprism/blob/master/images/repo.png?raw=true)
 
 ## Tech List
 
@@ -46,6 +46,6 @@ No external libraries are planned for this project other than the `cmu_graphics`
 
 ## Storyboard
 
-![Storyboard](https://github.com/manorajesh/pyprism/blob/master/images/storyboard.jpg)
+![Storyboard](https://github.com/manorajesh/pyprism/blob/master/images/storyboard.jpg?raw=true)
 
 ---
