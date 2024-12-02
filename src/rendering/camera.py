@@ -147,7 +147,6 @@ class Camera:
         return [x, y, z]
 
     def zoom(self, app, amount):
-        print(self.radius, self.fov)
         # Sensitivity should decrease as the radius decreases
         if app.is_ortho:
             sensitivity = 0.001 * self.fov

@@ -1,3 +1,4 @@
+
 from matrix_util import *
 from cmu_graphics import *
 from rendering.shading import *
@@ -108,23 +109,26 @@ class Mesh:
 
         self.screen_coords = screen_coords
 
+        # Add mesh properties to triangles
+        for tri in triangles:
+            tri['is_editable'] = self.is_editable
+            if not app.edit_mode and self == app.selected_object:
+                tri['border'] = 'orange'
+                tri['borderWidth'] = 0.5
+            elif app.edit_mode:
+                tri['opacity'] = 50
+
+        # Draw vertices in edit mode
         if app.edit_mode:
             for point in screen_coords:
                 drawCircle(point[0], point[1], 2, fill='white')
 
-        # Highlight selected vertex or mesh
+        # Highlight selected vertex
         if app.edit_mode and self.selected_vertex is not None:
             point = screen_coords[self.selected_vertex]
             drawCircle(point[0], point[1], 3, fill='orange')
 
-        if not app.edit_mode and self == app.selected_object:
-            for tri in triangles:
-                drawPolygon(*tri['points'], fill=tri['color'],
-                            border='orange', borderWidth=0.5)
-        else:
-            for tri in triangles:
-                drawPolygon(*tri['points'], fill=tri['color'],
-                            opacity=50 if app.edit_mode else 100)
+        return triangles
 
     def point_over_vertex(self, x, y, threshold=5):
         for point in self.screen_coords:

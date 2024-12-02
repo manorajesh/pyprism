@@ -45,9 +45,9 @@ def onAppStart(app):
     app.world = World(app.camera, app.width, app.height)
 
     app.world.addObject(Grid(size=5))
+    app.world.addObject(PointLight(10))
     app.world.addObject(ImportedMesh("suzanne.obj"))
     # app.world.addObject(Plane())
-    app.world.addObject(PointLight(10))
     app.world.addObject(Gizmo())
 
     app.selected_object = None
