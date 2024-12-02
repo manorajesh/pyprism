@@ -44,11 +44,10 @@ def onAppStart(app):
 
     app.world = World(app.camera, app.width, app.height)
 
-    app.world.addObject(Grid(size=5))
-    app.world.addObject(PointLight(10))
-    app.world.addObject(ImportedMesh("suzanne.obj"))
-    # app.world.addObject(Plane())
-    app.world.addObject(Gizmo())
+    app.world.add_object(Grid(size=5))
+    app.world.add_object(PointLight(10))
+    app.world.add_object(ImportedMesh("suzanne.obj"))
+    app.world.add_object(Gizmo())
 
     app.selected_object = None
     app.transform_mode = None  # 'move', 'rotate', 'scale'

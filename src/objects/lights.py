@@ -4,17 +4,20 @@ from cmu_graphics import *
 
 
 class Light():
-
     def __init__(self, intensity, x=1, y=-1, z=1):
         self.intensity = intensity
         self.x = x
         self.y = y
         self.z = z
         self.is_selectable = True
+        self.is_editable = False
         self.screen_coords = None
 
     def get_view_direction(self):
         # Same as getting camera view direction
+        x = self.x
+        y = self.y
+        z = self.z
         length = math.sqrt(x * x + y * y + z * z)
         if length != 0:
             x /= length
@@ -78,7 +81,7 @@ class PointLight(Light):
         movement_factor = 0.01  # Adjust as necessary
         if app.transform_mode == 'move':
             move_vector = [dx * movement_factor, -dy *
-                           movement_factor, dy * movement_factor]
+                           movement_factor, -dx * movement_factor]
             if app.axis_constraint == 'x':
                 move_vector[1] = move_vector[2] = 0
             elif app.axis_constraint == 'y':

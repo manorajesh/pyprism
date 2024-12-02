@@ -97,7 +97,8 @@ class Mesh:
                 continue  # Skip triangles facing away
 
             # Shading
-            color = self.shading_model.shade(normal, light_dir=[1, -1, 1])
+            color = self.shading_model.shade(
+                normal, light_dir=app.world.get_light_direction())
 
             # Calculate average depth
             avg_depth = sum([v[2] for v in [v0, v1, v2]]) / 3
@@ -168,7 +169,7 @@ class Mesh:
         movement_factor = 0.01  # Adjust as necessary
         if app.transform_mode == 'move':
             move_vector = [dx * movement_factor, -dy *
-                           movement_factor, dy * movement_factor]
+                           movement_factor, -dx * movement_factor]
             if app.axis_constraint == 'x':
                 move_vector[1] = move_vector[2] = 0
             elif app.axis_constraint == 'y':

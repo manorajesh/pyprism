@@ -1,19 +1,27 @@
 from cmu_graphics import *
+from objects.lights import *
 
 
 class World:
     def __init__(self, camera, width, height):
         self.camera = camera
         self.objects = []
+        self.light = None
         self.width = width
         self.height = height
 
-    def addObject(self, obj):
+    def add_object(self, obj):
+        if isinstance(obj, Light):
+            self.light = obj
         self.objects.append(obj)
 
-    def removeObject(self, obj):
+    def remove_object(self, obj):
         if obj in self.objects:
             self.objects.remove(obj)
+
+    def get_light_direction(self):
+        if self.light:
+            return self.light.get_view_direction()
 
     def render(self, app):
         if app.width != self.width or app.height != self.height:
