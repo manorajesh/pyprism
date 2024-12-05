@@ -46,7 +46,7 @@ def onAppStart(app):
 
     app.world.add_object(Grid(size=5))
     app.world.add_object(PointLight(10))
-    app.world.add_object(ImportedMesh("teapot.obj"))
+    app.world.add_object(ImportedMesh("suzanne.obj"))
     app.world.add_object(Gizmo())
 
     app.selected_object = None

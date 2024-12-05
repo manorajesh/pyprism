@@ -7,42 +7,60 @@
 
 In addition to a functional 3D modeling environment that allows users to create and manipulate objects in a virtual space, PyPrism will include a path-traced rendering engine. This will simulate realistic lighting effects, such as reflections, refractions, and global illumination, using a physically accurate approach to light transport.
 
-Key features of the project include:
+## Installation
 
-- **3D Object Rendering:** Ability to render primative 3D objects like planes and cubes. Also be able to import `.obj` files.
-- **3D Modeling:** Ability to create and manipulate 3D objects in a 3D space.
-- **Interactive Camera Control:** Users can navigate/interact with the 3D space using the keyboard and mouse.
-- **Path-Traced Renderer:** Realistic lighting simulation.
+Clone the repository and create the virtual environment:
 
-## Similar Projects
+```bash
+git clone https://github.com/manorajesh/pyprism.git && cd pyprism
+```
 
-1. **Three.js**
+Create a virtual environment:
 
-   - **Key Features:**
-     - Comprehensive scene graph for managing 3D objects.
-     - Advanced shading and lighting.
-     - Support for various 3D file formats and textures.
+```bash
+python -m venv env/ && source env/bin/activate
+```
 
-2. **Blender 3D**
+```bash
+pip install -r requirements.txt
+```
 
-   - **Key Features:**
-     - Comprehensive modeling and animation tools.
-     - Realistic rendering with physics-based shading.
+## Usage
 
-3. **Unity Engine**
+Run the main script:
 
-   - **Key Features:**
-     - Editor for scene management and object manipulation.
-     - Real-time lighting and shading features.
+```bash
+python src/main.py
+```
 
-## Version Control
+This will open a window displaying the 3D modeling environment.
 
-**Git** will be the main version control for this project. All project files will be hosted on **GitHub** alongside local backups. Regular commits will be made to track project progress and ease development.
+### Controls
 
-![Github Screenshot](https://github.com/manorajesh/pyprism/blob/master/images/repo.png?raw=true)
+#### Camera Controls
 
-## Tech List
+- Hold `Space` and move mouse to orbit the camera around the scene.
+- Hold `q` and move mouse to zoom camera
+- Press `x`, `y`, or `z` to snap the camera to the x, y, or z axis, respectively.
+- Press `5` to toggle between orthographic and perspective projection.
 
-No external libraries are planned for this project other than the `cmu_graphics` library and Python 3.\*. Possibly **numpy** for performance optimization.
+#### Object Controls
 
----
+- Press `tab` to switch between object selection and edit mode.
+
+##### Object Mode
+
+- In object selection mode, right click with the mouse on an object to select it. It will highlight in orange.
+- Hold `g` and move the mouse to translate the selected object.
+- Hold `r` and move the mouse to rotate the selected object.
+- Hold `s` and move the mouse to scale the selected object.
+  - For any of the above transformations, press `x`, `y`, or `z` to constrain the transformation to the x, y, or z axis, respectively.
+- Press `delete` to delete the selected object.
+
+##### Edit Mode
+
+- Press `1` for vertex selection mode and `2` for face selection mode.
+- In edit mode, right click with the mouse on a vertex/face to select it. It will highlight in orange.
+- Hold `g` and move the mouse to translate the selected vertex.
+  - Press `x`, `y`, or `z` to constrain the transformation to the x, y, or z axis, respectively.
+- Press `e` to extrude the selected face.
