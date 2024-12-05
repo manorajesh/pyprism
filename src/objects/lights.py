@@ -12,6 +12,7 @@ class Light():
         self.is_editable = False
         self.selection_mode = 'vertex'
         self.screen_coords = None
+        self.should_render_mesh = False
 
     def get_view_direction(self):
         # Same as getting camera view direction

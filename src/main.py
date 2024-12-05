@@ -46,7 +46,8 @@ def onAppStart(app):
 
     app.world.add_object(Grid(size=5))
     app.world.add_object(PointLight(10))
-    app.world.add_object(ImportedMesh("teapot.obj"))
+    # app.world.add_object(ImportedMesh("teapot.obj"))
+    app.world.add_object(Cube())
     app.world.add_object(Gizmo())
 
     app.selected_object = None
@@ -139,6 +140,8 @@ def onKeyPress(app, key, modifiers):
         app.is_transforming = False
     elif key == 'A' and 'shift' in modifiers:
         app.world.add_object(ImportedMesh("suzanne.obj"))
+    elif key == 'p':
+        app.world.render_path_traced()
 
 
 def onKeyRelease(app, key):

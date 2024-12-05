@@ -15,6 +15,7 @@ class Gizmo:
             # Z-axis
             ([0, 0, 0, 1], [0, 0, size, 1], 'blue'),
         ]
+        self.should_render_mesh = False
 
     def render(self, app):
         gizmo_size_in_pixels = 40

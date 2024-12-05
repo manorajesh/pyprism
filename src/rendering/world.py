@@ -1,5 +1,6 @@
 from cmu_graphics import *
 from objects.lights import *
+from rendering.path_tracer import *
 
 
 class World:
@@ -55,3 +56,9 @@ class World:
             for obj in self.objects:
                 if obj.is_editable:
                     obj.point_over_vertex(mouseX, mouseY)
+
+    def render_path_traced(self, samples=1):
+        """Render the scene using path tracing"""
+        tracer = PathTracer(100, 100, samples)
+        image = tracer.render(self)
+        return image

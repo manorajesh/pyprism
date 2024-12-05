@@ -4,10 +4,11 @@ from rendering.shading import *
 
 
 class Mesh:
-    def __init__(self, vertices, indices, shading_model=Lambertian(), is_editable=False, is_selectable=True):
+    def __init__(self, vertices, indices, shading_model=Lambertian(), is_editable=False, is_selectable=True, should_render_mesh=False):
         self.vertices = vertices  # List of [x,y,z,w] vertices
         self.indices = indices    # List of triangle indices
         self.shading_model = shading_model
+        self.should_render_mesh = should_render_mesh
 
         # Screen coordinates for vertices
         # Used for point selection in edit mode
@@ -308,7 +309,7 @@ class Cube(Mesh):
             4, 5, 1,  4, 1, 0
         ]
 
-        super().__init__(vertices, indices, is_editable=True)
+        super().__init__(vertices, indices, is_editable=True, should_render_mesh=True)
 
 
 class Plane(Mesh):
@@ -325,7 +326,7 @@ class Plane(Mesh):
             0, 1, 2,  0, 2, 3
         ]
 
-        super().__init__(vertices, indices, is_editable=True)
+        super().__init__(vertices, indices, is_editable=True, should_render_mesh=True)
 
 
 class Grid(Mesh):
@@ -397,7 +398,8 @@ class Grid(Mesh):
 class ImportedMesh(Mesh):
     def __init__(self, file_path, shading_model=Lambertian()):
         vertices, indices = self.load_obj(file_path)
-        super().__init__(vertices, indices, shading_model, is_editable=True)
+        super().__init__(vertices, indices, shading_model,
+                         is_editable=True, should_render_mesh=True)
 
     @staticmethod
     def load_obj(file_path):
