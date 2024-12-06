@@ -67,6 +67,11 @@ def onAppStart(app):
     app.add_menu_y = 10
 
 
+def onResize(app):
+    app.add_menu_x = app.width//5
+    app.help_y = app.height - 30
+
+
 def onMouseMove(app, mouseX, mouseY):
     dx = mouseX - app.prev_mouse[0]
     dy = mouseY - app.prev_mouse[1]
