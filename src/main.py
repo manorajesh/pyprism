@@ -6,6 +6,7 @@ from objects.lights import *
 from objects.gizmo import *
 from rendering.camera import *
 from rendering.world import *
+from ui import *
 
 
 class FrameStats:
@@ -32,6 +33,7 @@ def onAppStart(app):
     app.is_ortho = False
     app.prev_mouse = (0, 0)
     app.is_extruding = False
+    app.is_panning = False
 
     app.camera = Camera(
         x=0, y=0, z=-5,
@@ -55,6 +57,10 @@ def onAppStart(app):
     app.axis_constraint = None  # 'x', 'y', 'z'
     app.is_transforming = False
     app.selection_mode = 'vertex'  # or 'face'
+    app.show_help = False
+
+    app.help_x = 30
+    app.help_y = app.height - 30
 
 
 def onMouseMove(app, mouseX, mouseY):
@@ -66,14 +72,36 @@ def onMouseMove(app, mouseX, mouseY):
         app.selected_object.update_extrusion(dy)
     elif app.is_transforming and app.selected_object:
         app.selected_object.transform(app, dx, dy)
-
-    if app.is_zooming:
+    elif app.is_panning:
+        app.camera.pan(dx, dy)
+    elif app.is_zooming:
         app.camera.zoom(app, dy)
     elif app.is_orbiting:
         app.camera.orbit(-dx, dy)
 
 
 def onMousePress(app, mouseX, mouseY):
+    # Check if click is in scene list area
+    if mouseX < app.width//5:
+        y_start = 27
+        idx = 0
+        for obj in app.world.objects:
+            if obj.is_selectable:
+                idx += 1
+                y = y_start + (idx * 20)
+                if y - 10 <= mouseY <= y + 10:
+                    app.selected_object = obj
+                    return
+
+    # Check if help button is clicked
+    if ((mouseX - app.help_x)**2 + (mouseY - app.help_y)**2 <= 100):
+        app.show_help = not app.show_help
+        return
+
+    if app.show_help:
+        app.show_help = False
+        return
+
     app.prev_mouse = (mouseX, mouseY)
     if app.edit_mode:
         for obj in app.world.objects:
@@ -101,6 +129,8 @@ def onKeyPress(app, key, modifiers):
         app.is_orbiting = True
     elif key == 'q':
         app.is_zooming = True
+    elif key == 'w':
+        app.is_panning = True
     elif key == 'tab':
         app.edit_mode = not app.edit_mode
     elif key == 'g':
@@ -155,6 +185,8 @@ def onKeyRelease(app, key):
         app.is_orbiting = False
     elif key == 'q':
         app.is_zooming = False
+    elif key == 'w':
+        app.is_panning = False
     elif key in ['g', 'r', 's']:
         app.transform_mode = None
         app.is_transforming = False
@@ -172,19 +204,12 @@ def onStep(app):
 def redrawAll(app):
     app.world.render(app)
 
-    drawLabel(f"Frame time: {app.frame_stats.frame_time():.2f}ms", 100, 10)
-    drawLabel(f"FPS: {app.frame_stats.fps():.2f}", 100, 25)
-    if app.edit_mode:
-        drawLabel("Edit Mode", 100, 40, fill='red')
-    if app.selected_object:
-        drawLabel(f"Selected: {type(app.selected_object).__name__}", 100, 55)
-    if app.transform_mode:
-        drawLabel(f"Transform Mode: {app.transform_mode}", 100, 70)
-    if app.axis_constraint:
-        drawLabel(f"Axis Constraint: {app.axis_constraint}", 100, 80)
-    if app.selected_object:
-        drawLabel(f"Selection Mode: {
-                  app.selected_object.selection_mode}", 100, 90)
+    drawUi(app)
+
+    drawLabel(f"Frame time: {app.frame_stats.frame_time(
+    ):.2f}ms", app.width//5 + 20, 10, fill='white', align='left')
+    drawLabel(f"FPS: {app.frame_stats.fps():.2f}", app.width //
+              5 + 20, 25, fill='white', align='left')
 
 
 def main():

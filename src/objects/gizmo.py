@@ -25,13 +25,32 @@ class Gizmo:
         drawCircle(offset_x + gizmo_size_in_pixels / 2,
                    offset_y + gizmo_size_in_pixels / 2, gizmo_size_in_pixels, fill='white', opacity=20)
 
+        # ignore the view matrix translation
+        # so that gizmo is always at the center of the screen
+        view_matrix = [
+            [1, 0, 0, 0],
+            [0, 1, 0, 0],
+            [0, 0, 1, 0],
+            [0, 0, 0, 1]
+        ]
+
+        # only use rotation
+        rotation = [
+            app.camera.view_matrix[0][:3] + [0],
+            app.camera.view_matrix[1][:3] + [0],
+            app.camera.view_matrix[2][:3] + [0],
+            [0, 0, 0, 1]
+        ]
+
+        view_matrix = matrix_multiply(rotation, view_matrix)
+        projection_view = matrix_multiply(
+            app.camera.gizmo_perspective_matrix, view_matrix)
+
         # Render axes
         for start, end, color in self.axes:
-            # Apply camera transformation for perspective projection
-            transformed_start = matrix_vector_multiply(
-                app.camera.gizmo_projection_view_matrix, start)
-            transformed_end = matrix_vector_multiply(
-                app.camera.gizmo_projection_view_matrix, end)
+            # Apply modified view transformation
+            transformed_start = matrix_vector_multiply(projection_view, start)
+            transformed_end = matrix_vector_multiply(projection_view, end)
 
             # Just use transformed start and end points as NDC
             # for orthographic projection

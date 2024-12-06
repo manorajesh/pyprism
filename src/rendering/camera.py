@@ -48,6 +48,8 @@ class Camera:
         self.gizmo_projection_view_matrix = self.projection_view_matrix
         self.gizmo_perspective_matrix = self.perspective_matrix
 
+        self.target = [0, 0, 0]  # Add target point tracking
+
     def move(self, x, y, z):
         self.x += x
         self.y += y
@@ -81,7 +83,7 @@ class Camera:
         self.projection_view_matrix = matrix_multiply(
             self.perspective_matrix, self.view_matrix)
 
-    def orbit(self, dx, dy, target=[0, 0, 0], sensitivity=0.01):
+    def orbit(self, dx, dy, sensitivity=0.01):
         # Orbit Camera
         # https://community.khronos.org/t/implementing-an-orbit-camera/75208/4
 
@@ -95,17 +97,17 @@ class Camera:
         self.elevation = max(-math.pi / 2, min(math.pi / 2, self.elevation))
 
         # Get the new camera position
-        x = target[0] + self.radius * \
+        x = self.target[0] + self.radius * \
             math.cos(self.elevation) * math.sin(self.azimuth)
-        y = target[1] + self.radius * math.sin(self.elevation)
-        z = target[2] + self.radius * \
+        y = self.target[1] + self.radius * math.sin(self.elevation)
+        z = self.target[2] + self.radius * \
             math.cos(self.elevation) * math.cos(self.azimuth)
 
         # Update camera position
         self.x, self.y, self.z = x, y, z
 
         # Update the view matrix to look at the target
-        self.lookAt([self.x, self.y, self.z], target, [0, 1, 0])
+        self.lookAt([self.x, self.y, self.z], self.target, [0, 1, 0])
 
     def lookAt(self, position, target, up):
         # gluLookAt https://registry.khronos.org/OpenGL-Refpages/gl2.1/xhtml/gluLookAt.xml
@@ -162,7 +164,7 @@ class Camera:
             # force perspective update
             self.orbit(0, 0)
 
-    def snap_to_axis(self, axis, target=[0, 0, 0]):
+    def snap_to_axis(self, axis):
         match axis:
             case 'x':
                 self.elevation = 0
@@ -176,17 +178,17 @@ class Camera:
             case _:
                 raise ValueError('Invalid axis supplied: x, y, z allowed')
 
-        x = target[0] + self.radius * \
+        x = self.target[0] + self.radius * \
             math.cos(self.elevation) * math.sin(self.azimuth)
-        y = target[1] + self.radius * math.sin(self.elevation)
-        z = target[2] + self.radius * \
+        y = self.target[1] + self.radius * math.sin(self.elevation)
+        z = self.target[2] + self.radius * \
             math.cos(self.elevation) * math.cos(self.azimuth)
 
         # Update camera position
         self.x, self.y, self.z = x, y, z
 
         # Update the view matrix to look at the target
-        self.lookAt([self.x, self.y, self.z], target, [0, 1, 0])
+        self.lookAt([self.x, self.y, self.z], self.target, [0, 1, 0])
 
     def is_ortho(self, app):
         if app.is_ortho:
@@ -196,3 +198,34 @@ class Camera:
             self.fov = self.prev_fov
 
         self.resize(app.width, app.height)
+
+    def pan(self, dx, dy):
+        # panning is just like translating an object in screen space
+        speed = 0.005
+
+        right = normalize(cross([0, 1, 0], self.get_view_direction()))
+        up = normalize(cross(self.get_view_direction(), right))
+
+        # Calculate screen-space movement
+        move_right = [x * -dx * speed for x in right]
+        move_up = [x * dy * speed for x in up]
+
+        # Update both camera position and target
+        move_vector = [
+            move_right[0] + move_up[0],
+            move_right[1] + move_up[1],
+            move_right[2] + move_up[2]
+        ]
+
+        self.x += move_vector[0]
+        self.y += move_vector[1]
+        self.z += move_vector[2]
+
+        # Update target point
+        self.target = [
+            self.target[0] + move_vector[0],
+            self.target[1] + move_vector[1],
+            self.target[2] + move_vector[2]
+        ]
+
+        self.lookAt([self.x, self.y, self.z], self.target, [0, 1, 0])
