@@ -124,9 +124,10 @@ class Grid(Mesh):
 class ImportedMesh(Mesh):
     def __init__(self, file_path, shading_model=Lambertian()):
         vertices, indices = self.load_obj(file_path)
+        self.name = file_path.split('/')[-1].split('.')[0]
         super().__init__(vertices, indices, shading_model, is_editable=True)
 
-    @ staticmethod
+    @staticmethod
     def load_obj(file_path):
         # https://cs418.cs.illinois.edu/website/text/obj.html
         vertices = []

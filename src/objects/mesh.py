@@ -94,9 +94,9 @@ class Mesh:
             edge2 = [world_v2[i] - world_v0[i] for i in range(3)]
             normal = cross(edge1, edge2)
 
-            # Backface culling
-            if dot(normal, app.camera.get_view_direction()) <= 0 and not app.edit_mode:
-                continue  # Skip triangles facing away
+            # Backface culling is disabled because it doesn't work with rotations
+            # if dot(normal, app.camera.get_view_direction()) <= 0 and not app.edit_mode:
+            #     continue  # Skip triangles facing away
 
             # Shading
             color = self.shading_model.shade(

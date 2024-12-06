@@ -62,6 +62,10 @@ def onAppStart(app):
     app.help_x = 30
     app.help_y = app.height - 30
 
+    app.show_add_menu = False
+    app.add_menu_x = app.width//5
+    app.add_menu_y = 10
+
 
 def onMouseMove(app, mouseX, mouseY):
     dx = mouseX - app.prev_mouse[0]
@@ -81,6 +85,36 @@ def onMouseMove(app, mouseX, mouseY):
 
 
 def onMousePress(app, mouseX, mouseY):
+    # Check add button click
+    if (mouseX < app.width//5 and
+        mouseY > app.add_menu_y - 15 and
+            mouseY < app.add_menu_y + 15):
+        app.show_add_menu = not app.show_add_menu
+        return
+
+    # Check add menu options
+    if app.show_add_menu:
+        menu_x = 10
+        menu_y = app.add_menu_y + 25
+        menu_w = app.width//5 - 20
+        menu_h = 25
+
+        for i, option in enumerate(['Cube', 'Plane', 'Suzanne', 'Sphere', 'Teapot']):
+            if (menu_x <= mouseX <= menu_x + menu_w and
+                    menu_y + i*menu_h <= mouseY <= menu_y + (i+1)*menu_h):
+                if option == 'Cube':
+                    app.world.add_object(Cube())
+                elif option == 'Plane':
+                    app.world.add_object(Plane())
+                elif option == 'Suzanne':
+                    app.world.add_object(ImportedMesh("suzanne.obj"))
+                elif option == 'Sphere':
+                    app.world.add_object(ImportedMesh("sphere.obj"))
+                elif option == 'Teapot':
+                    app.world.add_object(ImportedMesh("teapot.obj"))
+                app.show_add_menu = False
+                return
+
     # Check if click is in scene list area
     if mouseX < app.width//5:
         y_start = 27
@@ -170,8 +204,6 @@ def onKeyPress(app, key, modifiers):
         app.transform_mode = None
         app.axis_constraint = None
         app.is_transforming = False
-    elif key == 'A' and 'shift' in modifiers:
-        app.world.add_object(ImportedMesh("suzanne.obj"))
     elif key == 'e':
         if (app.selected_object and
             app.selected_object.selection_mode == 'face' and
@@ -195,10 +227,6 @@ def onKeyRelease(app, key):
         app.is_extruding = False
         if app.selected_object:
             app.selected_object.finish_extrusion()
-
-
-def onStep(app):
-    pass
 
 
 def redrawAll(app):

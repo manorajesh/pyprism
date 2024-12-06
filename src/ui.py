@@ -4,6 +4,7 @@ from cmu_graphics import *
 def drawUi(app):
     drawPanel(app)
     drawSceneObjectsList(app)
+    drawAddObjectMenu(app)
     drawPropertiesPanel(app)
     drawHelpButton(app)
     if app.show_help:
@@ -24,10 +25,10 @@ def drawText(text, x, y, fill='white', font='arial', size=12, align='left', high
 
 def drawSceneObjectsList(app):
     # Scene Objects Header
-    drawText('Scene', 10, 25, size=14, highlight_width=app.width//5,
-             highlight_height=27, highlight_fill=rgb(40, 40, 40), bold=True)
+    drawText('Scene', 10, 30, size=14, highlight_width=app.width//5,
+             highlight_height=32, highlight_fill=rgb(40, 40, 40), bold=True)
 
-    y_start = 27
+    y_start = 32
     idx = 0
     for obj in app.world.objects:
         if obj.is_selectable:
@@ -42,7 +43,8 @@ def drawSceneObjectsList(app):
             else:
                 drawRect(0, y - 10, app.width//5, 20, fill=bg_color)
 
-            drawText(type(obj).__name__, 15, y, size=12)
+            name = obj.name if hasattr(obj, 'name') else type(obj).__name__
+            drawText(name, 15, y, size=12)
 
 
 def drawObjectListItem(app, obj, background):
@@ -147,7 +149,6 @@ def drawHelpPopup(app):
         ]),
         ('Modeling', [
             'E: Extrude (in face mode)',
-            'Shift + A: Add Monkey',
             'Backspace: Delete selected object'
         ]),
         ('Click anywhere to close', [])
@@ -161,3 +162,23 @@ def drawHelpPopup(app):
             drawText(item, x + 40, ty, size=12)
             ty += 20
         ty += 10
+
+
+def drawAddObjectMenu(app):
+    # Add button
+    y = app.add_menu_y
+    drawText('+ Add', 10, y, size=14, highlight_width=app.width//5,
+             highlight_height=25, highlight_fill=rgb(40, 40, 40))
+
+    if app.show_add_menu:
+        # Menu background
+        options = ['Cube', 'Plane', 'Suzanne', 'Sphere', 'Teapot']
+        menu_y = y + 25
+        menu_h = 25 * len(options)
+        drawRect(10, menu_y, app.width//5-20, menu_h,
+                 fill=rgb(50, 50, 50), border=rgb(60, 60, 60))
+
+        # Menu options
+        for i, option in enumerate(options):
+            option_y = menu_y + (i * 25) + 12
+            drawText(option, 20, option_y, size=12)
