@@ -23,7 +23,8 @@ class Gizmo:
 
         # Draw background circle
         drawCircle(offset_x + gizmo_size_in_pixels / 2,
-                   offset_y + gizmo_size_in_pixels / 2, gizmo_size_in_pixels, fill='white', opacity=20)
+                   offset_y + gizmo_size_in_pixels / 2, gizmo_size_in_pixels,
+                   fill='white', opacity=20)
 
         # ignore the view matrix translation
         # so that gizmo is always at the center of the screen
@@ -67,7 +68,8 @@ class Gizmo:
             ]
 
             # Draw line
-            drawLine(screen_start[0], screen_start[1], screen_end[0], screen_end[1],
+            drawLine(screen_start[0], screen_start[1], screen_end[0],
+                     screen_end[1],
                      fill=color, lineWidth=2)
 
             # Draw Axis Labels

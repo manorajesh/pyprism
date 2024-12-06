@@ -15,7 +15,9 @@ def drawPanel(app):
     drawRect(0, 0, app.width//5, app.height, fill=rgb(30, 30, 30), opacity=90)
 
 
-def drawText(text, x, y, fill='white', font='arial', size=12, align='left', highlight_width=0, highlight_height=0, highlight_fill='black', bold=False):
+def drawText(text, x, y, fill='white', font='arial', size=12, align='left',
+             highlight_width=0, highlight_height=0, highlight_fill='black',
+             bold=False):
     if highlight_width > 0 or highlight_height > 0:
         drawRect(x - 10, y - highlight_height//2, highlight_width,
                  highlight_height, fill=highlight_fill)
@@ -90,8 +92,10 @@ def drawPropertiesPanel(app):
     if app.edit_mode:
         y += 50
         drawText('Select:', 15, y, size=12)
-        vertex_color = 'orange' if app.selected_object.selection_mode == 'vertex' else 'white'
-        face_color = 'orange' if app.selected_object.selection_mode == 'face' else 'white'
+        vertex_color = 'orange' if \
+            app.selected_object.selection_mode == 'vertex' else 'white'
+        face_color = 'orange' if \
+            app.selected_object.selection_mode == 'face' else 'white'
         drawText('Vertex (1)', 60, y, fill=vertex_color, size=12)
         drawText('Face (2)', 60, y + 20, fill=face_color, size=12)
 

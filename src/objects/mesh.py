@@ -4,7 +4,8 @@ from rendering.shading import *
 
 
 class Mesh:
-    def __init__(self, vertices, indices, shading_model=Lambertian(), is_editable=False, is_selectable=True):
+    def __init__(self, vertices, indices, shading_model=Lambertian(),
+                 is_editable=False, is_selectable=True):
         self.vertices = vertices  # List of [x,y,z,w] vertices
         self.indices = indices    # List of triangle indices
         self.shading_model = shading_model
@@ -95,12 +96,14 @@ class Mesh:
             normal = cross(edge1, edge2)
 
             # Backface culling is disabled because it doesn't work with rotations
-            # if dot(normal, app.camera.get_view_direction()) <= 0 and not app.edit_mode:
+            # if dot(normal, app.camera.get_view_direction()) <= 0
+            # \ and not app.edit_mode:
             #     continue  # Skip triangles facing away
 
             # Shading
             color = self.shading_model.shade(
-                normal, light_dir=app.world.get_light_direction()) if self.shading_model else 'white'
+                normal, light_dir=app.world.get_light_direction()) \
+                if self.shading_model else 'white'
 
             # Calculate average depth
             avg_depth = sum([v[2] for v in [v0, v1, v2]]) / 3
@@ -120,7 +123,8 @@ class Mesh:
                 tri['opacity'] = 50
 
         # Draw vertices in edit mode
-        if app.edit_mode and self.selection_mode == 'vertex' and app.selected_object == self:
+        if app.edit_mode and self.selection_mode == 'vertex' \
+                and app.selected_object == self:
             for point in screen_coords:
                 drawCircle(point[0], point[1], 2, fill='white')
 
@@ -130,7 +134,8 @@ class Mesh:
             drawCircle(point[0], point[1], 3, fill='orange')
 
         # Highlight selected face
-        if app.edit_mode and self.selection_mode == 'face' and self.selected_face is not None:
+        if app.edit_mode and self.selection_mode == 'face' \
+                and self.selected_face is not None:
             idx0 = self.indices[self.selected_face]
             idx1 = self.indices[self.selected_face + 1]
             idx2 = self.indices[self.selected_face + 2]
@@ -252,7 +257,8 @@ class Mesh:
             elif app.axis_constraint == 'z':
                 move_vector = [0, 0, move_vector[2]]
 
-            if self.selection_mode == 'vertex' and self.selected_vertex is not None:
+            if self.selection_mode == 'vertex' \
+                    and self.selected_vertex is not None:
                 # Move single vertex
                 idx = self.selected_vertex
                 self.vertices[idx] = vector_add(

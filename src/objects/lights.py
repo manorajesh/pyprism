@@ -80,7 +80,8 @@ class PointLight(Light):
             return False
 
         if self.screen_coords[0] - 10 <= mouseX <= self.screen_coords[0] + 10 \
-                and self.screen_coords[1] - 10 <= mouseY <= self.screen_coords[1] + 10:
+                and self.screen_coords[1] - 10 \
+        <= mouseY <= self.screen_coords[1] + 10:
             return True
 
     def apply_translation(self, move_vector):

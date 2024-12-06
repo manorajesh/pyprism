@@ -144,7 +144,8 @@ def point_in_triangle(px, py, v1, v2, v3):
     # Calculate area of the entire triangle
     total_area = tri_area(v1[0], v1[1], v2[0], v2[1], v3[0], v3[1])
 
-    # Calculate areas of three triangles made between the point and triangle vertices
+    # Calculate areas of three
+    # triangles made between the point and triangle vertices
     area1 = tri_area(px, py, v2[0], v2[1], v3[0], v3[1])
     area2 = tri_area(v1[0], v1[1], px, py, v3[0], v3[1])
     area3 = tri_area(v1[0], v1[1], v2[0], v2[1], px, py)

@@ -104,10 +104,11 @@ def onMousePress(app, mouseX, mouseY):
         menu_w = app.width//5 - 20
         menu_h = 25
 
-        # Used ChatGPT to make option lists dynamic instead of fixed to Cube and Plane
-        # Key was to use index of option element to adjust the window in which to check
-        # for mouse click.
-        for i, option in enumerate(['Cube', 'Plane', 'Suzanne', 'Sphere', 'Teapot']):
+        # Used ChatGPT to make option lists dynamic instead of fixed to Cube
+        # and Plane. Key was to use index of option element to adjust the
+        # window in which to check for mouse click.
+        for i, option in enumerate(['Cube', 'Plane', 'Suzanne', 'Sphere',
+                                    'Teapot']):
             if (menu_x <= mouseX <= menu_x + menu_w and
                     menu_y + i*menu_h <= mouseY <= menu_y + (i+1)*menu_h):
                 if option == 'Cube':
