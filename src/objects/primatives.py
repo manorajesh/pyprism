@@ -167,6 +167,8 @@ class Mesh:
         if not self.screen_coords or self.selection_mode != 'vertex':
             return
 
+        self.selected_face = None
+
         for idx, point in enumerate(self.screen_coords):
             dx = point[0] - mouseX
             dy = point[1] - mouseY
@@ -179,6 +181,11 @@ class Mesh:
         if not self.screen_coords or self.selection_mode != 'face':
             return False
 
+        self.selected_vertex = None
+
+        # Store faces that contain the clicked point along with their depths
+        candidate_faces = []
+
         for i in range(0, len(self.indices), 3):
             idx0 = self.indices[i]
             idx1 = self.indices[i+1]
@@ -188,19 +195,27 @@ class Mesh:
             v1 = self.screen_coords[idx1]
             v2 = self.screen_coords[idx2]
 
-            # Use the point_in_triangle function from matrix_util
             if point_in_triangle(mouseX, mouseY,
                                  (v0[0], v0[1]),
                                  (v1[0], v1[1]),
                                  (v2[0], v2[1])):
-                if i == self.selected_face:
-                    self.selected_face = None  # Deselect if clicking same face
-                else:
-                    self.selected_face = i    # Select new face
-                return True
+                # Calculate average depth of the face
+                avg_depth = (v0[2] + v1[2] + v2[2]) / 3
+                candidate_faces.append((i, avg_depth))
 
-        self.selected_face = None
-        return False
+        if not candidate_faces:
+            self.selected_face = None
+            return False
+
+        # Sort faces by depth and select the closest one
+        candidate_faces.sort(key=lambda x: x[1])
+        closest_face_idx = candidate_faces[0][0]
+
+        if closest_face_idx == self.selected_face:
+            self.selected_face = None  # Deselect if clicking same face
+        else:
+            self.selected_face = closest_face_idx  # Select new face
+        return True
 
     def transform(self, app, dx, dy):
         # Making sure that you can only transform
