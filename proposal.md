@@ -2,16 +2,14 @@
 
 ![Build & Test](https://github.com/manorajesh/pyprism/actions/workflows/python-app.yml/badge.svg)
 
-**PyPrism** is a comprehensive 3D modeling and rendering toolkit entirely in Python, rendered with the `cmu_graphics` library. The project will implement everything from scratch from matrix operations, to perspective projection, to path tracing. The goal is to provide a simple and intuitive interface for creating and manipulating 3D objects in a virtual space, as well as a path-traced rendering engine for realistic lighting effects.
-
-In addition to a functional 3D modeling environment that allows users to create and manipulate objects in a virtual space, PyPrism will include a path-traced rendering engine. This will simulate realistic lighting effects, such as reflections, refractions, and global illumination, using a physically accurate approach to light transport.
+**PyPrism** is a comprehensive 3D modeling and rendering toolkit entirely in Python, rendered with the `cmu_graphics` library. The project will implement everything from scratch from matrix operations to perspective projection. The goal is to provide a simple and intuitive interface for creating and manipulating 3D objects in a virtual space. The project will include a scene graph, object properties, and a camera system for navigating the 3D space. Based around edit and object modes, users can create, select, and manipulate objects in the scene. Users can select faces and vertices, being able to translate them and extrude faces. Users can dynamically add and delete objects to the scene. The project can also read obj files so that users can import 3D models into the scene (e.g. `sphere.obj`, `suzanne.obj`, etc.). The project will also include a simple rendering engine that can render the scene with a camera and lighting system using Lambertian shading. The project has a simple panel UI to display various object and program statistics.
 
 Key features of the project include:
 
 - **3D Object Rendering:** Ability to render primative 3D objects like planes and cubes. Also be able to import `.obj` files.
 - **3D Modeling:** Ability to create and manipulate 3D objects in a 3D space.
 - **Interactive Camera Control:** Users can navigate/interact with the 3D space using the keyboard and mouse.
-- **Path-Traced Renderer:** Realistic lighting simulation.
+- **Lamberian Shading:** Implement a simple shading model to render objects in the scene.
 
 ## Similar Projects
 
@@ -42,7 +40,7 @@ Key features of the project include:
 
 ## Tech List
 
-No external libraries are planned for this project other than the `cmu_graphics` library and Python 3.\*. Possibly **numpy** for performance optimization.
+No external libraries are planned for this project other than the `cmu_graphics` library and Python 3.\*.
 
 ## Storyboard
 
