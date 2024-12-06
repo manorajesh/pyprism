@@ -62,6 +62,7 @@ def identity_matrix():
 
 
 def translation_matrix(tx, ty, tz):
+    # Same as camera translation matrix
     return [
         [1, 0, 0, tx],
         [0, 1, 0, ty],
@@ -72,6 +73,8 @@ def translation_matrix(tx, ty, tz):
 
 def rotation_matrix(angle, axis):
     # https://math.libretexts.org/Bookshelves/Applied_Mathematics/Mathematics_for_Game_Developers_(Burzynski)/04%3A_Matrices/4.06%3A_Rotation_Matrices_in_3-Dimensions
+
+    # Nested functions for cleaner code
     def rotation_x(angle):
         c = math.cos(angle)
         s = math.sin(angle)
@@ -112,11 +115,13 @@ def rotation_matrix(angle, axis):
     rz = rotation_z(angle * z)
 
     # Combine rotations (order matters: Z * Y * X)
+    # Used ChatGPT to understand that order matters
     return matrix_multiply(rz, matrix_multiply(ry, rx))
 
 
 def scaling_matrix(sx, sy, sz):
     # https://en.wikipedia.org/wiki/Scaling_(geometry)
+    # homogenous coordinate is 1 for no difference
     return [
         [sx, 0,  0,  0],
         [0,  sy, 0,  0],
@@ -129,18 +134,20 @@ def vector_add(a, b):
     return [a[i] + b[i] for i in range(len(a))]
 
 
+def tri_area(x1, y1, x2, y2, x3, y3):
+    return abs((x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2))/2.0)
+
+
 def point_in_triangle(px, py, v1, v2, v3):
     # https://www.geeksforgeeks.org/check-whether-a-given-point-lies-inside-a-triangle-or-not/
-    def area(x1, y1, x2, y2, x3, y3):
-        return abs((x1*(y2 - y3) + x2*(y3 - y1) + x3*(y1 - y2))/2.0)
 
     # Calculate area of the entire triangle
-    total_area = area(v1[0], v1[1], v2[0], v2[1], v3[0], v3[1])
+    total_area = tri_area(v1[0], v1[1], v2[0], v2[1], v3[0], v3[1])
 
     # Calculate areas of three triangles made between the point and triangle vertices
-    area1 = area(px, py, v2[0], v2[1], v3[0], v3[1])
-    area2 = area(v1[0], v1[1], px, py, v3[0], v3[1])
-    area3 = area(v1[0], v1[1], v2[0], v2[1], px, py)
+    area1 = tri_area(px, py, v2[0], v2[1], v3[0], v3[1])
+    area2 = tri_area(v1[0], v1[1], px, py, v3[0], v3[1])
+    area3 = tri_area(v1[0], v1[1], v2[0], v2[1], px, py)
 
     # Point is inside if sum of three areas equals total area
     return abs(total_area - (area1 + area2 + area3)) < 0.0001

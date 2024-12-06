@@ -108,9 +108,6 @@ class Mesh:
             triangles.append(
                 {'depth': avg_depth, 'points': points, 'color': color})
 
-        # Already sorted by world render
-        # triangles.sort(key=lambda tri: tri['depth'], reverse=True)
-
         self.screen_coords = screen_coords
 
         # Add mesh properties to triangles
@@ -157,10 +154,15 @@ class Mesh:
             return False
 
         # Simple bounding box check
-        min_x = min(point[0] for point in self.screen_coords)
-        max_x = max(point[0] for point in self.screen_coords)
-        min_y = min(point[1] for point in self.screen_coords)
-        max_y = max(point[1] for point in self.screen_coords)
+        min_x = float('inf')
+        max_x = 0
+        min_y = float('inf')
+        max_y = 0
+        for point in self.screen_coords:
+            min_x = min(min_x, point[0])
+            max_x = max(max_x, point[0])
+            min_y = min(min_y, point[1])
+            max_y = max(max_y, point[1])
         return min_x <= mouseX <= max_x and min_y <= mouseY <= max_y
 
     def check_vertex_selection(self, mouseX, mouseY, threshold=5):
@@ -172,7 +174,7 @@ class Mesh:
         for idx, point in enumerate(self.screen_coords):
             dx = point[0] - mouseX
             dy = point[1] - mouseY
-            if dx * dx + dy * dy < threshold * threshold:
+            if dx * dx + dy * dy < threshold * threshold:  # Distance check
                 self.selected_vertex = idx
                 return
         self.selected_vertex = None
@@ -182,6 +184,10 @@ class Mesh:
             return False
 
         self.selected_vertex = None
+
+        # Used ChatGPT to implement candidate_face logic
+        # as it was just an evolution of the existing logic
+        # for selecting one face
 
         # Store faces that contain the clicked point along with their depths
         candidate_faces = []
@@ -234,6 +240,7 @@ class Mesh:
         if app.transform_mode == 'move':
             # Create movement vector based on camera orientation
             # https://www.youtube.com/watch?v=7kGCrq1cJew
+            # Used ChatGPT to understand the logic and get started
             right_movement = [x * dx * movement_factor for x in camera_right]
             up_movement = [x * -dy * movement_factor for x in camera_up]
             move_vector = vector_add(right_movement, up_movement)
@@ -334,6 +341,7 @@ class Mesh:
         idx_new0, idx_new1, idx_new2 = self.extrude_new_vertices_indices
 
         # Add side faces and extruded face
+        # Used ChatGPT to generate the indices for the new faces
         idx_list = [
             idx0, idx1, idx_new1, idx0, idx_new1, idx_new0,  # Side face 1
             idx1, idx2, idx_new2, idx1, idx_new2, idx_new1,  # Side face 2

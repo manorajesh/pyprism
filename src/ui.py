@@ -24,7 +24,7 @@ def drawText(text, x, y, fill='white', font='arial', size=12, align='left', high
 
 
 def drawSceneObjectsList(app):
-    # Scene Objects Header
+    # Scene Objects
     drawText('Scene', 10, 30, size=14, highlight_width=app.width//5,
              highlight_height=32, highlight_fill=rgb(40, 40, 40), bold=True)
 
@@ -35,6 +35,9 @@ def drawSceneObjectsList(app):
             idx += 1
             bg_color = rgb(40, 40, 40) if idx % 2 == 0 else rgb(50, 50, 50)
             y = y_start + (idx * 20)
+            # so that the list doesn't go below into properties panel
+            if y >= app.height//2:
+                break
 
             # Highlight selected object
             if obj == app.selected_object:
@@ -61,6 +64,7 @@ def drawPropertiesPanel(app):
     if not app.selected_object:
         return
 
+    # Padding so that properties panel doesn't overlap with scene list
     y = app.height // 2
 
     # Properties Header

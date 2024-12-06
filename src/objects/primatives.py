@@ -20,6 +20,8 @@ class Cube(Mesh):
             [-s,  s, -s, 1],  # 7
         ]
 
+        # Used ChatGPT to generate these indices
+        # and understand the order of vertices
         indices = [
             # Front
             0, 1, 2,  0, 2, 3,
@@ -64,6 +66,7 @@ class Grid(Mesh):
         step = size / divisions
 
         # Generate vertices for grid lines along X and Z axes
+        # Used ChatGPT to understand the logic and get started
         for i in range(divisions + 1):
             position = -half_size + i * step
             vertices.append([position, 0, -half_size, 1])  # Start point
@@ -104,9 +107,6 @@ class Grid(Mesh):
 
             start_point = screen_coords[idx_start]
             end_point = screen_coords[idx_end]
-
-            # TODO: Issue with start_point and end_point being out of bounds
-            # and too large when camera is zoomed in
 
             # color the two center x and z axis lines red and blue
             if idx_start == 20:

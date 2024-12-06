@@ -51,6 +51,7 @@ class PointLight(Light):
         self.screen_coords = [x, y, z]
 
         # Create octagon points
+        # https://stackoverflow.com/questions/31428564/calculate-coordinates-for-octagon
         size = 10
         points = []
         for i in range(8):
@@ -81,21 +82,6 @@ class PointLight(Light):
         if self.screen_coords[0] - 10 <= mouseX <= self.screen_coords[0] + 10 \
                 and self.screen_coords[1] - 10 <= mouseY <= self.screen_coords[1] + 10:
             return True
-
-    # def transform(self, app, dx, dy):
-    #     # Same as mesh transform
-    #     movement_factor = 0.01  # Adjust as necessary
-    #     if app.transform_mode == 'move':
-    #         move_vector = [dx * movement_factor, -dy *
-    #                        movement_factor, -dx * movement_factor]
-    #         if app.axis_constraint == 'x':
-    #             move_vector[1] = move_vector[2] = 0
-    #         elif app.axis_constraint == 'y':
-    #             move_vector[0] = move_vector[2] = 0
-    #         elif app.axis_constraint == 'z':
-    #             move_vector[0] = move_vector[1] = 0
-
-    #         self.apply_translation(move_vector)
 
     def apply_translation(self, move_vector):
         self.x += move_vector[0]
