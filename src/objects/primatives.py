@@ -100,7 +100,7 @@ class Mesh:
 
             # Shading
             color = self.shading_model.shade(
-                normal, light_dir=app.world.get_light_direction())
+                normal, light_dir=app.world.get_light_direction()) if self.shading_model else 'white'
 
             # Calculate average depth
             avg_depth = sum([v[2] for v in [v0, v1, v2]]) / 3
@@ -218,32 +218,40 @@ class Mesh:
         return True
 
     def transform(self, app, dx, dy):
-        # Making sure that you can only transform
-        # vertices when in edit mode
         if not app.edit_mode or self.selection_mode == 'face':
             self.selected_vertex = None
 
         if not app.edit_mode or self.selection_mode == 'vertex':
             self.selected_face = None
 
-        # Map screen movement to world coordinates
+        # Get camera right and up vectors for screen-space movement
+        # https://gamedev.stackexchange.com/a/139704
+        view_dir = app.camera.get_view_direction()
+        camera_right = normalize(cross([0, 1, 0], view_dir))
+        camera_up = normalize(cross(view_dir, camera_right))
+
         movement_factor = 0.01
         if app.transform_mode == 'move':
-            move_vector = [dx * movement_factor, -dy *
-                           movement_factor, -dx * movement_factor]
+            # Create movement vector based on camera orientation
+            # https://www.youtube.com/watch?v=7kGCrq1cJew
+            right_movement = [x * dx * movement_factor for x in camera_right]
+            up_movement = [x * -dy * movement_factor for x in camera_up]
+            move_vector = vector_add(right_movement, up_movement)
+
             if app.axis_constraint == 'x':
-                move_vector[1] = move_vector[2] = 0
+                move_vector = [move_vector[0], 0, 0]
             elif app.axis_constraint == 'y':
-                move_vector[0] = move_vector[2] = 0
+                move_vector = [0, move_vector[1], 0]
             elif app.axis_constraint == 'z':
-                move_vector[0] = move_vector[1] = 0
+                move_vector = [0, 0, move_vector[2]]
+
             if self.selection_mode == 'vertex' and self.selected_vertex is not None:
                 # Move single vertex
                 idx = self.selected_vertex
                 self.vertices[idx] = vector_add(
                     self.vertices[idx], move_vector + [0])
             elif self.selection_mode == 'face' and self.selected_face:
-                # Move vertices of selected faces
+                # Move vertices of selected face
                 affected_vertices = set()
                 for i in range(3):
                     affected_vertices.add(self.indices[self.selected_face + i])
@@ -254,6 +262,7 @@ class Mesh:
             else:
                 # Move entire mesh
                 self.apply_translation(move_vector)
+
         elif app.transform_mode == 'rotate':
             angle = dx * movement_factor
             if app.axis_constraint == 'x':

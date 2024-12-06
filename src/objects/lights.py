@@ -1,8 +1,9 @@
 from matrix_util import *
 from cmu_graphics import *
+from objects.primatives import Mesh
 
 
-class Light():
+class Light(Mesh):
     def __init__(self, intensity, x=1, y=-1, z=1):
         self.intensity = intensity
         self.x = x
@@ -12,6 +13,8 @@ class Light():
         self.is_editable = False
         self.selection_mode = 'vertex'
         self.screen_coords = None
+
+        super().__init__([], [], None, False, True)
 
     def get_view_direction(self):
         # Same as getting camera view direction
@@ -79,20 +82,20 @@ class PointLight(Light):
                 and self.screen_coords[1] - 10 <= mouseY <= self.screen_coords[1] + 10:
             return True
 
-    def transform(self, app, dx, dy):
-        # Same as mesh transform
-        movement_factor = 0.01  # Adjust as necessary
-        if app.transform_mode == 'move':
-            move_vector = [dx * movement_factor, -dy *
-                           movement_factor, -dx * movement_factor]
-            if app.axis_constraint == 'x':
-                move_vector[1] = move_vector[2] = 0
-            elif app.axis_constraint == 'y':
-                move_vector[0] = move_vector[2] = 0
-            elif app.axis_constraint == 'z':
-                move_vector[0] = move_vector[1] = 0
+    # def transform(self, app, dx, dy):
+    #     # Same as mesh transform
+    #     movement_factor = 0.01  # Adjust as necessary
+    #     if app.transform_mode == 'move':
+    #         move_vector = [dx * movement_factor, -dy *
+    #                        movement_factor, -dx * movement_factor]
+    #         if app.axis_constraint == 'x':
+    #             move_vector[1] = move_vector[2] = 0
+    #         elif app.axis_constraint == 'y':
+    #             move_vector[0] = move_vector[2] = 0
+    #         elif app.axis_constraint == 'z':
+    #             move_vector[0] = move_vector[1] = 0
 
-            self.apply_translation(move_vector)
+    #         self.apply_translation(move_vector)
 
     def apply_translation(self, move_vector):
         self.x += move_vector[0]
