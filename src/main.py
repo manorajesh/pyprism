@@ -31,6 +31,7 @@ def onAppStart(app):
     app.edit_mode = False
     app.is_ortho = False
     app.prev_mouse = (0, 0)
+    app.is_extruding = False
 
     app.camera = Camera(
         x=0, y=0, z=-5,
@@ -61,7 +62,9 @@ def onMouseMove(app, mouseX, mouseY):
     dy = mouseY - app.prev_mouse[1]
     app.prev_mouse = (mouseX, mouseY)
 
-    if app.is_transforming and app.selected_object:
+    if app.is_extruding and app.selected_object:
+        app.selected_object.update_extrusion(dy)
+    elif app.is_transforming and app.selected_object:
         app.selected_object.transform(app, dx, dy)
 
     if app.is_zooming:
@@ -139,6 +142,12 @@ def onKeyPress(app, key, modifiers):
         app.is_transforming = False
     elif key == 'A' and 'shift' in modifiers:
         app.world.add_object(ImportedMesh("suzanne.obj"))
+    elif key == 'e':
+        if (app.selected_object and
+            app.selected_object.selection_mode == 'face' and
+                app.selected_object.selected_face is not None):
+            app.is_extruding = True
+            app.selected_object.start_extrude_selected_face()
 
 
 def onKeyRelease(app, key):
@@ -150,6 +159,10 @@ def onKeyRelease(app, key):
         app.transform_mode = None
         app.is_transforming = False
         app.axis_constraint = None
+    elif key == 'e':
+        app.is_extruding = False
+        if app.selected_object:
+            app.selected_object.finish_extrusion()
 
 
 def onStep(app):

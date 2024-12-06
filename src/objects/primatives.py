@@ -300,6 +300,79 @@ class Mesh:
         scaling = scaling_matrix(*scale_vector)
         self.transform_matrix = matrix_multiply(scaling, self.transform_matrix)
 
+    def start_extrude_selected_face(self):
+        if self.selected_face is None:
+            return
+
+        # Indices of the selected face
+        idx0 = self.indices[self.selected_face]
+        idx1 = self.indices[self.selected_face + 1]
+        idx2 = self.indices[self.selected_face + 2]
+        self.extrude_face_indices = [idx0, idx1, idx2]
+
+        # Original positions of the face vertices
+        self.extrude_original_vertices = [
+            self.vertices[idx0][:3],
+            self.vertices[idx1][:3],
+            self.vertices[idx2][:3]
+        ]
+
+        # Compute the face normal
+        edge1 = [self.extrude_original_vertices[1][i] -
+                 self.extrude_original_vertices[0][i] for i in range(3)]
+        edge2 = [self.extrude_original_vertices[2][i] -
+                 self.extrude_original_vertices[0][i] for i in range(3)]
+        self.extrude_normal = normalize(cross(edge1, edge2))
+
+        # Duplicate vertices for the new face
+        self.extrude_new_vertices_indices = []
+        for v in self.extrude_original_vertices:
+            new_v = v + [1]
+            self.vertices.append(new_v)
+            self.extrude_new_vertices_indices.append(len(self.vertices) - 1)
+
+        idx_new0, idx_new1, idx_new2 = self.extrude_new_vertices_indices
+
+        # Add side faces and extruded face
+        idx_list = [
+            idx0, idx1, idx_new1, idx0, idx_new1, idx_new0,  # Side face 1
+            idx1, idx2, idx_new2, idx1, idx_new2, idx_new1,  # Side face 2
+            idx2, idx0, idx_new0, idx2, idx_new0, idx_new2,  # Side face 3
+            idx_new0, idx_new1, idx_new2  # Extruded face
+        ]
+        self.indices.extend(idx_list)
+
+        # Initialize extrusion offset
+        self.extrude_offset = 0.0
+
+    def update_extrusion(self, dy):
+        movement_factor = 0.01
+
+        # Get camera right and up vectors for screen-space movement
+        view_dir = app.camera.get_view_direction()
+        camera_right = normalize(cross([0, 1, 0], view_dir))
+        camera_up = normalize(cross(view_dir, camera_right))
+
+        up_movement = [x * -dy * movement_factor for x in camera_up]
+        self.extrude_offset += up_movement[1]
+
+        # Update positions of new vertices along the normal
+        for i, idx in enumerate(self.extrude_new_vertices_indices):
+            offset_vector = [self.extrude_normal[j] *
+                             self.extrude_offset for j in range(3)]
+            new_position = [self.extrude_original_vertices[i]
+                            [j] + offset_vector[j] for j in range(3)]
+            self.vertices[idx] = new_position + [1]
+
+    def finish_extrusion(self):
+        # Reset extrusion variables
+        self.selected_face = None
+        self.extrude_face_indices = None
+        self.extrude_new_vertices_indices = None
+        self.extrude_original_vertices = None
+        self.extrude_normal = None
+        self.extrude_offset = 0.0
+
 
 class Cube(Mesh):
     def __init__(self, size=1.0):
@@ -423,7 +496,7 @@ class ImportedMesh(Mesh):
         vertices, indices = self.load_obj(file_path)
         super().__init__(vertices, indices, shading_model, is_editable=True)
 
-    @staticmethod
+    @ staticmethod
     def load_obj(file_path):
         # https://cs418.cs.illinois.edu/website/text/obj.html
         vertices = []
